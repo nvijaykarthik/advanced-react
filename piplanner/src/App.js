@@ -245,15 +245,18 @@ class App extends Component {
 render() {
   let piList = this.state.piplanners.map(pi => {
     let it=this.state.itrs.find(itr=>itr.id===pi.itrId)
-    
-    console.log(it)
+    let itNo=""
+    if(typeof it != "undefined"){
+      itNo=it.itrNo
+    }
+    console.log(itNo)
     return (
       <tr key={pi.id}>
         <td>{pi.featureId}</td>
         <td>{pi.storyNumber}</td>
         <td>{pi.description}</td>
         <td>{pi.storyPointsDev}</td>
-        
+        <td>{itNo}</td>
         <td>{pi.comments}</td>
         <td><button className="btn btn-sm btn-warning">edit</button></td>
       </tr>
@@ -378,8 +381,6 @@ render() {
                     <li>Load</li>
                   </ul>
                 </ul>
-
-
               </div>
             </div>
           </div>
@@ -426,7 +427,7 @@ render() {
       {planView()}
       <div className="row">
         Pi Objective
-        </div>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,7 @@ export default class Home extends Component {
         selectedYear: "2020",
         teams: [],
         selectTeam: "",
+        selectTeamName: "",
         itrs: [],
         showPlan: false,
         capacity: [],
@@ -77,7 +78,7 @@ export default class Home extends Component {
         let piplan = { ...this.state.piplan };
         piplan.portfolioId = evt.target.value;
         this.loadProgramForPortfolio(evt.target.value);
-        this.setState({ selectedPortfolio: evt.target.value, piplan, showPlan: false, selectedProgram: "", selectTeam: "" });
+        this.setState({ selectedPortfolio: evt.target.value, piplan, showPlan: false, selectedProgram: "", selectTeam: "",selectTeamName:"" });
         this.loadTeamForPortfolio(evt.target.value);
     }
     loadProgramForPortfolio(portfolioId) {
@@ -131,7 +132,13 @@ export default class Home extends Component {
     onChangeTeam(evt) {
         let piplan = { ...this.state.piplan };
         piplan.teamId = evt.target.value;
-        this.setState({ selectTeam: evt.target.value, piplan, showPlan: false });
+        let tName=this.state.teams.find(t=>{
+            console.log(t.id+"="+evt.target.value)
+            return t.id==evt.target.value
+            
+        })
+        console.log(tName);
+        this.setState({ selectTeam: evt.target.value, piplan, showPlan: false, selectTeamName:tName.name});
     }
 
     btnLoadPlan() {
@@ -276,11 +283,11 @@ export default class Home extends Component {
                 let stMn = months[Number(stDt[1]) - 1]
                 edDate = stDt[2] + "/" + stMn;
             }
-            return (<td className="pb-0" key={itr.id}>Itr{itr.itrNo}<br /><small className="text-info">{stDate} to {edDate}</small></td>)
+            return (<td className="pb-0" key={itr.id}>Itr{itr.itrNo}<br /><small className="text-dark">{stDate} to {edDate}</small></td>)
         })
 
         let itrCapacityList = this.state.capacity.map(cp => {
-            return (<td className="pt-0" key={cp.itrId}><small className="text-info">C:&nbsp;{cp.capacity},L:&nbsp;{cp.load},({cp.percent}%)</small></td>)
+            return (<td className="pt-0" key={cp.itrId}><small className="text-dark">C:&nbsp;{cp.capacity},L:&nbsp;{cp.load},({cp.percent}%)</small></td>)
         })
 
         let grps = () => {
@@ -305,6 +312,7 @@ export default class Home extends Component {
             let groups = this.getGroupedPlann()
             if (groups !== "") {
                 let view = []
+                let i=0
                 for (let key in groups) {
                     if (groups.hasOwnProperty(key) && key !== 'backlog') {
                         var val = groups[key];
@@ -319,7 +327,9 @@ export default class Home extends Component {
                             </div>
                             )
                         })
-                        view.push(<td className="border-right">
+                        
+                        i++;
+                        view.push(<td key={i} className="border-right">
                             {ret}
                         </td>)
                     }
@@ -354,7 +364,7 @@ export default class Home extends Component {
                     </div>
                     <div className="m-2 ">
                         <i>Team:&nbsp;</i>
-                        <select className="form-control" id="portfolioList" onChange={(evt) => this.onChangeTeam(evt)}>
+                        <select className="form-control" id="teamList" onChange={(evt) => this.onChangeTeam(evt)}>
                             <option value=""></option>
                             {teamList}
                         </select>
@@ -366,7 +376,7 @@ export default class Home extends Component {
                         <table className="table table-borderless">
                             <thead>
                                 <tr>
-                                    <td className="pb-0"></td>
+                                    <td className="pb-0"><h1><i>{this.state.selectTeamName}</i></h1></td>
                                     {itrList}
                                 </tr>
                                 <tr>

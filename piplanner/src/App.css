@@ -58,6 +58,16 @@
   border:none;
 }
 
+.teamname{
+  font-weight: 500;
+  font-size: 24px;
+  font-style: italic;
+  background:rgb(122, 217, 255);
+  border:solid 1px rgb(77, 148, 255);
+  padding:3px;
+  margin-bottom:2px;
+}
+
 .stories{
   font-size: 13px;
   border:solid 1px #f0d53f;

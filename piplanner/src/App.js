@@ -12,6 +12,7 @@ class App extends Component {
     selectedYear: "2020",
     teams: [],
     selectTeam: "",
+    selectTeamName: "",
     itrs: [],
     showPlan: false,
     capacity: [],
@@ -135,8 +136,11 @@ class App extends Component {
   onChangeTeam(evt) {
     let piplan = { ...this.state.piplan };
     piplan.teamId = evt.target.value;
-    this.setState({ selectTeam: evt.target.value, piplan, showPlan: false });
-  }
+    let tName=this.state.teams.find(t=>{
+        return t.id==evt.target.value
+    })
+    this.setState({ selectTeam: evt.target.value, piplan, showPlan: false, selectTeamName:tName.name});
+}
 
   btnLoadPlan() {
     if (this.state.selectedProgram === "") {
@@ -432,7 +436,9 @@ class App extends Component {
             <div className="col-md-10">
               <div className="card">
                 <div className="card-body">
-                  <button type="button" className="btn btn-primary btn-sm float-right mb-1" onClick={() => this.btnNewPlan()} data-toggle="modal" data-target="#featurePopup">New Feature</button>
+                 <div className="clearfix"><span className="teamname">{this.state.selectTeamName}</span>
+                 <button type="button" className="btn btn-primary btn-sm float-right mb-1" onClick={() => this.btnNewPlan()} data-toggle="modal" data-target="#featurePopup">New Feature</button>
+                 </div>
                   <table className="table table-bordered">
                     <thead className="thead-dark">
                       <tr>

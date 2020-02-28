@@ -8,6 +8,7 @@ import Planner from './components/Planner';
 import Home from './components/Home';
 import Vacation from './components/Vacation';
 import Teams from './components/Teams';
+import PiCalendar from './components/PiCalendar';
 
 const Main = () => (
     <main>
@@ -16,6 +17,7 @@ const Main = () => (
             <Route exact path='/teams' component={Teams} />
             <Route exact path='/proPlann' component={Planner} />
             <Route exact path='/vacation' component={Vacation}/>
+            <Route exact path='/piCalendar' component={PiCalendar}/>
         </Switch>
     </main>
 )
@@ -29,6 +31,7 @@ const Menu = () => (
                 <Link to='/teams' className='nav-item nav-link'>Teams</Link>
                 <Link to='/proPlann' className='nav-item nav-link'>Program Planner</Link>
                 <Link to='/vacation' className='nav-item nav-link'>Vacation</Link>
+                <Link to='/piCalendar' className='nav-item nav-link'>PI Calendar</Link>
             </div>
         </div>
     </nav>

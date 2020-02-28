@@ -7,11 +7,13 @@ import {
 import Planner from './components/Planner';
 import Home from './components/Home';
 import Vacation from './components/Vacation';
+import Teams from './components/Teams';
 
 const Main = () => (
     <main>
         <Switch>
             <Route exact path='/' component={Home} />
+            <Route exact path='/teams' component={Teams} />
             <Route exact path='/proPlann' component={Planner} />
             <Route exact path='/vacation' component={Vacation}/>
         </Switch>
@@ -19,10 +21,16 @@ const Main = () => (
 )
 
 const Menu = () => (
-    <nav className='nav nav-pills nav-justified'>
-        <Link to='/' className='nav-link'>Home</Link>
-        <Link to='/proPlann' className='nav-link'>Program Planner</Link>
-        <Link to='/vacation' className='nav-link'>Vacation</Link>
+    <nav className='navbar navbar-expand-lg navbar-dark bg-primary'>
+        <span class="navbar-brand mb-0 h1" >Program Dashboard</span>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav mr-auto">
+                <Link to='/' className='nav-item nav-link'>Home</Link>
+                <Link to='/teams' className='nav-item nav-link'>Teams</Link>
+                <Link to='/proPlann' className='nav-item nav-link'>Program Planner</Link>
+                <Link to='/vacation' className='nav-item nav-link'>Vacation</Link>
+            </div>
+        </div>
     </nav>
 )
 

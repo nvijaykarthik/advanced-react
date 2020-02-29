@@ -248,7 +248,7 @@ export default class Vacation extends Component {
                         i++
                         if (iteration.hasOwnProperty(itr)) {
                             let member = iteration[itr]
-                            td.push(<td className="border-right align-middle text-center" key={i} ><a className="btn btn-sm border-bottom" onClick={() => this.showSelectedVacation(member)}>{member.leaveDays}</a></td>)
+                            td.push(<td className="border-right align-middle text-center" key={i} ><button className="btn btn-sm border-bottom" onClick={() => this.showSelectedVacation(member)}>{member.leaveDays}</button></td>)
                         }
                     }
                     tr.push(<tr key={x}>{td}</tr>)

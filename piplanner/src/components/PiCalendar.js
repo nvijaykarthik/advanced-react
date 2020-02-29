@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
-import Loader from './Loader'
 import '../App.css';
+import Loader from './Loader';
 
 export default class PiCalendar extends Component {
     state = {
         year: "",
         portfolio: [],
         selecedPortfolioId: "",
+        selectedPortfolio: {
+            id: 0,
+            name: ""
+        },
         showPlan: false,
         programs: [],
         pSaveBtnTxt: "fas fa-plus",
+        iSaveBtnTxt: "fas fa-plus",
         selectedProgram: {
             createdDate: "",
             endDate: "",
@@ -17,10 +22,22 @@ export default class PiCalendar extends Component {
             id: 0,
             piNo: 0,
             portfolioId: 0,
-            startDate: "0"
+            startDate: ""
         },
-        loader: false
-
+        selectedProgramNo: 0,
+        loader: false,
+        showItr: false,
+        iterations: [],
+        selectedIeration: {
+            createdDate: "",
+            endDate: "",
+            workingDays: "",
+            id: 0,
+            itrNo: 0,
+            programPlanId: 0,
+            startDate: ""
+        },
+        selectedProgramId:0
     }
 
     componentDidMount() {
@@ -40,13 +57,12 @@ export default class PiCalendar extends Component {
     }
 
     onChangeYear(evt) {
-        this.setState({ year: evt.target.value, showPlan: false })
+        this.setState({ year: evt.target.value, showPlan: false, showItr: false })
     }
     onChangePortfolio(evt) {
-        this.setState({ selecedPortfolioId: evt.target.value, showPlan: false });
+        this.setState({ selecedPortfolioId: evt.target.value, showPlan: false, showItr: false });
     }
     loadProgramForPortfolio() {
-
         let portfolioId = this.state.selecedPortfolioId
         if (this.state.year === "") {
             alert("Please enter the year");
@@ -90,6 +106,22 @@ export default class PiCalendar extends Component {
         this.setState({ selectedProgram })
     }
 
+    createPiCalendar() {
+        this.setState({ loader: true })
+        let self = this
+        fetch("http://localhost:8080/api/createProgramCalendar?portfolioId=" + this.state.selecedPortfolioId + "&fiYear=" + this.state.year, {
+            method: 'post',
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            self.loadProgramForPortfolio()
+            alert("Program created Succefully")
+            self.setState({ loader: false })
+        });
+    }
     saveProgram() {
         let selectedProg = this.state.selectedProgram
         if (selectedProg.piNo === 0) {
@@ -100,18 +132,21 @@ export default class PiCalendar extends Component {
             selectedProg.portfolioId = this.state.selecedPortfolioId
         }
         if (selectedProg.id === 0) {
+            selectedProg.fiYear = this.state.year
+        }
+        if (selectedProg.id === 0) {
             let progAvail = this.state.programs.find(pr => {
                 if (pr.piNo == selectedProg.piNo) {
                     return true
                 }
             })
-            if(typeof progAvail !== "undefined"){
+            if (typeof progAvail !== "undefined") {
                 alert("program Number is already available")
                 return
             }
         }
-        console.log(selectedProg)
         let self = this
+        this.setState({ loader: true })
         fetch('http://localhost:8080/api/saveProgramCalendar', {
             method: 'post',
             body: JSON.stringify(selectedProg),
@@ -123,6 +158,8 @@ export default class PiCalendar extends Component {
         }).then(function (data) {
             self.loadProgramForPortfolio()
             alert("Saved Succefully")
+            self.setState({ loader: false })
+            self.clearProgram()
         });
 
     }
@@ -132,7 +169,102 @@ export default class PiCalendar extends Component {
         selectedProgram.startDate = ""
         selectedProgram.piNo = 0
         selectedProgram.id = 0
-        this.setState({ selectedProgram,pSaveBtnTxt:"fas fa-plus" })
+        selectedProgram.portfolioId=0
+        this.setState({ selectedProgram, pSaveBtnTxt: "fas fa-plus" })
+    }
+    loadIteration(prg) {
+        let progId = prg.id;
+        console.log(prg)
+        this.setState({ loader: true, showItr: false, selectedProgramNo: prg.piNo,selectedProgramId:progId })
+       this.fetchItr(progId)
+    }
+    fetchItr(progId){
+        fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + progId)
+        .then((response) => response.json())
+        .then((data) => {
+            this.setState({
+                iterations: data,
+                showItr: true,
+                loader: false
+            })
+            this.clearItr()
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            this.setState({ loader: false })
+        });
+    }
+    changeitrNo(e) {
+        let selectedIeration = { ...this.state.selectedIeration }
+        selectedIeration.itrNo = e.target.value
+        this.setState({ selectedIeration })
+    }
+    changeitrStDt(e) {
+        let selectedIeration = { ...this.state.selectedIeration }
+        selectedIeration.startDate = e.target.value
+        this.setState({ selectedIeration })
+    }
+    changeitrEdDt(e) {
+        let selectedIeration = { ...this.state.selectedIeration }
+        selectedIeration.endDate = e.target.value
+        this.setState({ selectedIeration })
+    }
+    changeitrWrkDay(e) {
+        let selectedIeration = { ...this.state.selectedIeration }
+        selectedIeration.workingDays = e.target.value
+        this.setState({ selectedIeration })
+    }
+    clearItr() {
+        let selectedIeration = { ...this.state.selectedIeration }
+        selectedIeration.endDate = ""
+        selectedIeration.startDate = ""
+        selectedIeration.itrNo = 0
+        selectedIeration.id = 0
+        selectedIeration.workingDays = 0
+        selectedIeration.programPlanId=0
+        this.setState({ selectedIeration, iSaveBtnTxt: "fas fa-plus" })
+    }
+    editItr(itr) {
+        this.setState({ iSaveBtnTxt: "fas fa-save", selectedIeration: itr })
+    }
+    saveItr(){
+        let itr = this.state.selectedIeration
+        console.log(itr)
+        if (itr.itrNo === 0) {
+            alert("please enter the Itr NO");
+            return
+        }
+        if (itr.programPlanId === 0) {
+            itr.programPlanId = this.state.selectedProgramId
+        }
+        if (itr.id === 0) {
+            let progAvail = this.state.iterations.find(pr => {
+                if (pr.itrNo == itr.itrNo) {
+                    return true
+                }
+            })
+            if (typeof progAvail !== "undefined") {
+                alert("Iteration Number is already available")
+                return
+            }
+        }
+        let self = this
+        this.setState({ loader: true })
+        fetch('http://localhost:8080/api/saveIterationCalendar', {
+            method: 'post',
+            body: JSON.stringify(itr),
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            alert("Saved Succefully")
+            self.setState({ loader: false })
+            self.clearItr()
+            self.fetchItr(itr.programPlanId)
+        });
+
     }
     render() {
         let portfolioList = this.state.portfolio.map(po => {
@@ -143,7 +275,7 @@ export default class PiCalendar extends Component {
                 return
             }
             if (this.state.programs.length === 0) {
-                return (<button className="btn btn-primary">Create Pi Calendar</button>)
+                return (<button className="btn btn-primary" onClick={() => this.createPiCalendar()}>Create Pi Calendar</button>)
             } else {
                 let Rows = this.state.programs.map(prg => {
                     return (
@@ -154,7 +286,7 @@ export default class PiCalendar extends Component {
                             <td>
                                 <div className="btn-group">
                                     <button className="btn btn-sm btn-warning" onClick={() => this.editProgram(prg)}><i className="fas fa-edit"></i></button>
-                                    <button className="btn btn-sm btn-info"><i className="fas fa-chevron-right"></i></button>
+                                    <button className="btn btn-sm btn-info" onClick={() => this.loadIteration(prg)}><i className="fas fa-chevron-right"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -177,6 +309,54 @@ export default class PiCalendar extends Component {
                                     <div className="btn-group">
                                         <button className="btn btn-success btn-sm" onClick={() => this.saveProgram()}><i className={this.state.pSaveBtnTxt}></i></button>
                                         <button className="btn btn-danger btn-sm" onClick={() => this.clearProgram()}><i className="fas fa-broom"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </thead>
+                    )
+                }
+                let table = <table className="table">{thead()}<tbody>{Rows}</tbody></table>
+                return table;
+            }
+        }
+        let iterations = () => {
+            if (!this.state.showItr) {
+                return
+            } else {
+                let Rows = this.state.iterations.map(itr => {
+                    return (
+                        <tr key={itr.id}>
+                            <td>{itr.itrNo}</td>
+                            <td>{itr.startDate}</td>
+                            <td>{itr.endDate}</td>
+                            <td>{itr.workingDays}</td>
+                            <td>
+                                <div className="btn-group">
+                                    <button className="btn btn-sm btn-warning" onClick={() => this.editItr(itr)}><i className="fas fa-edit"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    )
+                })
+                let thead = () => {
+                    return (
+                        <thead className="thead-light">
+                            <tr>
+                                <td>Iteration No</td>
+                                <td>Start Date</td>
+                                <td>End Date</td>
+                                <td>Working Days</td>
+                                <td>Options</td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" className="form-control form-control-sm" value={this.state.selectedIeration.itrNo} onChange={(e) => this.changeitrNo(e)} /></td>
+                                <td><input type="Date" className="form-control form-control-sm" value={this.state.selectedIeration.startDate ? this.state.selectedIeration.startDate : ""} onChange={(e) => this.changeitrStDt(e)} /></td>
+                                <td><input type="Date" className="form-control form-control-sm" value={this.state.selectedIeration.endDate ? this.state.selectedIeration.endDate : ''} onChange={(e) => this.changeitrEdDt(e)} /></td>
+                                <td><input type="number" className="form-control form-control-sm" value={this.state.selectedIeration.workingDays} onChange={(e) => this.changeitrWrkDay(e)} /></td>
+                                <td colSpan="2">
+                                    <div className="btn-group">
+                                        <button className="btn btn-success btn-sm" onClick={() => this.saveItr()}><i className={this.state.iSaveBtnTxt}></i></button>
+                                        <button className="btn btn-danger btn-sm" onClick={() => this.clearItr()}><i className="fas fa-broom"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -211,12 +391,23 @@ export default class PiCalendar extends Component {
                         Load Plan</button>
                 </div>
                 <div className="row mt-2">
-                    <div className="col-md-6">
+                    <div className="col-md-6 p-1">
                         <div className="card">
-                            <div className="card-body">{programList()}</div>
+
+                            <div className="card-body">
+                                <h5 className="card-title">Programs</h5>
+                                {programList()}
+                            </div>
                         </div>
                     </div>
-                    <div className="col-md-6"></div>
+                    <div className="col-md-6 p-1">
+                        <div className="card">
+                            <div className="card-body">
+        <h5 className="card-title">Iterations for selectedProgram : &nbsp;{this.state.selectedProgramNo}</h5>
+                                {iterations()}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         )

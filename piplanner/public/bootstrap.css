@@ -1023,15 +1023,27 @@ pre {
   .offset-xl-11 {
     margin-left: 91.66667%; } }
 
+.adjust {
+  width: 18% !important;
+  float: left !important;
+}
+.adjust-team {
+  width: 23% !important;
+  float: left !important;
+}
+.adjust-member {
+  width: 32% !important;
+  float: left !important;
+}
 .table {
   width: 100%;
   margin-bottom: 1rem;
   color: #212529; }
   .table th,
   .table td {
-    padding: 0.75rem;
+    padding: 0.25rem;
     vertical-align: top;
-    border-top: 1px solid #dee2e6; }
+    border-top: 0px solid #dee2e6; }
   .table thead th {
     vertical-align: bottom;
     border-bottom: 2px solid #dee2e6; }
@@ -1737,7 +1749,9 @@ fieldset:disabled a.btn {
 .btn-success {
   color: #fff;
   background-color: #28a745;
-  border-color: #28a745; }
+  border-color: #28a745; 
+  float:right;
+  padding:0rem .4rem !Important;}
   .btn-success:hover {
     color: #fff;
     background-color: #218838;
@@ -3727,7 +3741,7 @@ input[type="button"].btn-block {
 .list-group-item {
   position: relative;
   display: block;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 0.75rem;
   margin-bottom: -1px;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.125); }
@@ -3745,7 +3759,7 @@ input[type="button"].btn-block {
   .list-group-item.active {
     z-index: 2;
     color: #fff;
-    background-color: #007bff;
+    background-color: #00aeff;
     border-color: #007bff; }
 
 .list-group-horizontal {
@@ -7013,3 +7027,8 @@ a.text-dark:hover, a.text-dark:focus {
   .table .thead-dark th {
     color: inherit;
     border-color: #dee2e6; } }
+.team-container {
+  padding: 2rem 2rem; }
+.noBorder {
+  border-width:0 !Important;
+}

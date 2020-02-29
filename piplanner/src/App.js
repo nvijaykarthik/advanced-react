@@ -24,9 +24,9 @@ const Main = () => (
 
 const Menu = () => (
     <nav className='navbar navbar-expand-lg navbar-dark bg-primary'>
-        <span class="navbar-brand mb-0 h1" >Program Dashboard</span>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav mr-auto">
+        <span className="navbar-brand mb-0 h1" >Program Dashboard</span>
+          <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div className="navbar-nav mr-auto">
                 <Link to='/' className='nav-item nav-link'>Home</Link>
                 <Link to='/teams' className='nav-item nav-link'>Teams</Link>
                 <Link to='/proPlann' className='nav-item nav-link'>Program Planner</Link>

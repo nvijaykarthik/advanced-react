@@ -132,7 +132,7 @@ export default class PiCalendar extends Component {
         selectedProgram.startDate = ""
         selectedProgram.piNo = 0
         selectedProgram.id = 0
-        this.setState({ selectedProgram })
+        this.setState({ selectedProgram,pSaveBtnTxt:"fas fa-plus" })
     }
     render() {
         let portfolioList = this.state.portfolio.map(po => {
@@ -162,7 +162,7 @@ export default class PiCalendar extends Component {
                 })
                 let thead = () => {
                     return (
-                        <thead>
+                        <thead className="thead-light">
                             <tr>
                                 <td>PI NO</td>
                                 <td>Start Date</td>

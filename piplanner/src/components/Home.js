@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import '../App.css';
+import Loader from './Loader';
 
 export default class Home extends Component {
     state = {
@@ -41,86 +42,109 @@ export default class Home extends Component {
             commited: "",
             unCommited: "",
             risk: ""
-        }
+        },
+        loader:false
     }
 
     componentDidMount() {
-        fetch("http://localhost:8080/api/portfolio")
-            .then((response) => response.json())
-            .then((data) => {
-
-                this.setState({
-                    portfolio: data
-                })
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-
+        this.getYears()
+        this.getPortfolio();
+    }
+    getYears() {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getConfiguredYears")
             .then((response) => response.json())
             .then((data) => {
                 // //console.log('Success:', data);
                 this.setState({
-                    years: data
+                    years: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
-
+    }
+    getPortfolio() {
+        this.setState({ loader: true })
+        fetch("http://localhost:8080/api/portfolio")
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    portfolio: data,
+                    loader:false
+                })
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                this.setState({ loader: false })
+            });
     }
 
     onChangeYear(evt) {
-        this.setState({ selectedYear: evt.target.value })
+        this.setState({ selectedYear: evt.target.value, showPlan: false, selectedProgram: "", selectTeam: "", selectTeamName: "", programs: [], teams: [], portfolio: [] });
+        for(let i=0;i<10000;i++){
+            //introducing sync delay to make the async call work toload the buttons correctly
+        }
+        this.getPortfolio();
     }
     onChangePortfolio(evt) {
         let piplan = { ...this.state.piplan };
         piplan.portfolioId = evt.target.value;
         this.loadProgramForPortfolio(evt.target.value);
-        this.setState({ selectedPortfolio: evt.target.value, piplan, showPlan: false, selectedProgram: "", selectTeam: "",selectTeamName:"" });
+        this.setState({ selectedPortfolio: evt.target.value, piplan, showPlan: false, selectedProgram: "", selectTeam: "", selectTeamName: "" });
         this.loadTeamForPortfolio(evt.target.value);
     }
     loadProgramForPortfolio(portfolioId) {
         if (this.state.selectedYear === "") {
             alert("Please select the year");
         }
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    programs: data
+                    programs: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     loadTeamForPortfolio(portfolioId) {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/teamsForPortfolio?portfolioId=" + portfolioId)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    teams: data
+                    teams: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     loadIterationForProgram(prgId) {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + prgId)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    itrs: data
+                    itrs: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false})
             });
     }
     onChangeProgram(evt) {
@@ -132,13 +156,13 @@ export default class Home extends Component {
     onChangeTeam(evt) {
         let piplan = { ...this.state.piplan };
         piplan.teamId = evt.target.value;
-        let tName=this.state.teams.find(t=>{
-            console.log(t.id+"="+evt.target.value)
-            return t.id==evt.target.value
-            
+        let tName = this.state.teams.find(t => {
+            console.log(t.id + "=" + evt.target.value)
+            return t.id == evt.target.value
+
         })
         console.log(tName);
-        this.setState({ selectTeam: evt.target.value, piplan, showPlan: false, selectTeamName:tName.name});
+        this.setState({ selectTeam: evt.target.value, piplan, showPlan: false, selectTeamName: tName.name });
     }
 
     btnLoadPlan() {
@@ -150,22 +174,25 @@ export default class Home extends Component {
             alert("please select the team")
             return;
         }
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getPiPlanners?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
                     piplanners: data,
-                    showPlan: true
+                    showPlan: true,
+                    loader:false
                 })
                 this.getCapacity()
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
 
 
-
+            this.setState({ loader: true })
         fetch("http://localhost:8080/api/getProgramGoalForTeam?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
             .then((response) => response.json())
             .then((data) => {
@@ -178,25 +205,30 @@ export default class Home extends Component {
                     data.portfolioId = this.state.selectedPortfolio
                 }
                 this.setState({
-                    programGoal: data
+                    programGoal: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     getCapacity() {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    capacity: data
+                    capacity: data,
+                    loader:false
                 })
                 this.refreshLoad()
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     refreshLoad() {
@@ -312,7 +344,7 @@ export default class Home extends Component {
             let groups = this.getGroupedPlann()
             if (groups !== "") {
                 let view = []
-                let i=0
+                let i = 0
                 for (let key in groups) {
                     if (groups.hasOwnProperty(key) && key !== 'backlog') {
                         var val = groups[key];
@@ -327,7 +359,7 @@ export default class Home extends Component {
                             </div>
                             )
                         })
-                        
+
                         i++;
                         view.push(<td key={i} className="border-right">
                             {ret}
@@ -338,8 +370,14 @@ export default class Home extends Component {
             }
             return
         }
+        let loader = () => {
+            if (this.state.loader) {
+                return (<Loader />)
+            }
+        }
         return (
             <div className="container-fluid">
+                {loader()}
                 <div className="form-inline border-bottom">
                     <div className="m-2 ">
                         <i>Year:&nbsp;</i>
@@ -369,7 +407,7 @@ export default class Home extends Component {
                             {teamList}
                         </select>
                     </div>
-                    <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}>Load Plan</button>
+                    <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}><i class="fas fa-truck-loading"></i></button>
                 </div>
                 <div className="row mt-2">
                     <div className="col-md-12">

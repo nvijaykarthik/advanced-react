@@ -37,7 +37,7 @@ export default class PiCalendar extends Component {
             programPlanId: 0,
             startDate: ""
         },
-        selectedProgramId:0
+        selectedProgramId: 0
     }
 
     componentDidMount() {
@@ -169,30 +169,30 @@ export default class PiCalendar extends Component {
         selectedProgram.startDate = ""
         selectedProgram.piNo = 0
         selectedProgram.id = 0
-        selectedProgram.portfolioId=0
+        selectedProgram.portfolioId = 0
         this.setState({ selectedProgram, pSaveBtnTxt: "fas fa-plus" })
     }
     loadIteration(prg) {
         let progId = prg.id;
         console.log(prg)
-        this.setState({ loader: true, showItr: false, selectedProgramNo: prg.piNo,selectedProgramId:progId })
-       this.fetchItr(progId)
+        this.setState({ loader: true, showItr: false, selectedProgramNo: prg.piNo, selectedProgramId: progId })
+        this.fetchItr(progId)
     }
-    fetchItr(progId){
+    fetchItr(progId) {
         fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + progId)
-        .then((response) => response.json())
-        .then((data) => {
-            this.setState({
-                iterations: data,
-                showItr: true,
-                loader: false
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    iterations: data,
+                    showItr: true,
+                    loader: false
+                })
+                this.clearItr()
             })
-            this.clearItr()
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            this.setState({ loader: false })
-        });
+            .catch((error) => {
+                console.error('Error:', error);
+                this.setState({ loader: false })
+            });
     }
     changeitrNo(e) {
         let selectedIeration = { ...this.state.selectedIeration }
@@ -221,13 +221,13 @@ export default class PiCalendar extends Component {
         selectedIeration.itrNo = 0
         selectedIeration.id = 0
         selectedIeration.workingDays = 0
-        selectedIeration.programPlanId=0
+        selectedIeration.programPlanId = 0
         this.setState({ selectedIeration, iSaveBtnTxt: "fas fa-plus" })
     }
     editItr(itr) {
         this.setState({ iSaveBtnTxt: "fas fa-save", selectedIeration: itr })
     }
-    saveItr(){
+    saveItr() {
         let itr = this.state.selectedIeration
         console.log(itr)
         if (itr.itrNo === 0) {
@@ -295,13 +295,13 @@ export default class PiCalendar extends Component {
                 let thead = () => {
                     return (
                         <thead className="thead-light">
-                            <tr>
+                            <tr className="bg-dark text-white font-weight-bold">
                                 <td>PI NO</td>
                                 <td>Start Date</td>
                                 <td>End Date</td>
                                 <td>Options</td>
                             </tr>
-                            <tr>
+                            <tr className="bg-info">
                                 <td><input type="number" className="form-control form-control-sm" value={this.state.selectedProgram.piNo} onChange={(e) => this.changePiNo(e)} /></td>
                                 <td><input type="Date" className="form-control form-control-sm" value={this.state.selectedProgram.startDate ? this.state.selectedProgram.startDate : ""} onChange={(e) => this.changeStDt(e)} /></td>
                                 <td><input type="Date" className="form-control form-control-sm" value={this.state.selectedProgram.endDate ? this.state.selectedProgram.endDate : ''} onChange={(e) => this.changeEdDt(e)} /></td>
@@ -315,7 +315,7 @@ export default class PiCalendar extends Component {
                         </thead>
                     )
                 }
-                let table = <table className="table">{thead()}<tbody>{Rows}</tbody></table>
+                let table = <table className="table table-striped">{thead()}<tbody>{Rows}</tbody></table>
                 return table;
             }
         }
@@ -341,14 +341,14 @@ export default class PiCalendar extends Component {
                 let thead = () => {
                     return (
                         <thead className="thead-light">
-                            <tr>
+                            <tr className="bg-dark text-white font-weight-bold">
                                 <td>Iteration No</td>
                                 <td>Start Date</td>
                                 <td>End Date</td>
                                 <td>Working Days</td>
                                 <td>Options</td>
                             </tr>
-                            <tr>
+                            <tr className="bg-info">
                                 <td><input type="number" className="form-control form-control-sm" value={this.state.selectedIeration.itrNo} onChange={(e) => this.changeitrNo(e)} /></td>
                                 <td><input type="Date" className="form-control form-control-sm" value={this.state.selectedIeration.startDate ? this.state.selectedIeration.startDate : ""} onChange={(e) => this.changeitrStDt(e)} /></td>
                                 <td><input type="Date" className="form-control form-control-sm" value={this.state.selectedIeration.endDate ? this.state.selectedIeration.endDate : ''} onChange={(e) => this.changeitrEdDt(e)} /></td>
@@ -363,7 +363,7 @@ export default class PiCalendar extends Component {
                         </thead>
                     )
                 }
-                let table = <table className="table">{thead()}<tbody>{Rows}</tbody></table>
+                let table = <table className="table table-striped">{thead()}<tbody>{Rows}</tbody></table>
                 return table;
             }
         }
@@ -388,22 +388,21 @@ export default class PiCalendar extends Component {
                         </select>
                     </div>
                     <button className="btn btn-primary" onClick={() => this.loadProgramForPortfolio()}>
-                        Load Plan</button>
+                    <i class="fas fa-truck-loading"></i></button>
                 </div>
                 <div className="row mt-2">
                     <div className="col-md-6 p-1">
-                        <div className="card">
-
+                        <div className="card shadow">
                             <div className="card-body">
                                 <h5 className="card-title">Programs</h5>
                                 {programList()}
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-6 p-1">
-                        <div className="card">
+                    <div className="col-md-6 p-1 ">
+                        <div className="card shadow">
                             <div className="card-body">
-        <h5 className="card-title">Iterations for selectedProgram : &nbsp;{this.state.selectedProgramNo}</h5>
+                                <h5 className="card-title">Iterations for selectedProgram : &nbsp;{this.state.selectedProgramNo}</h5>
                                 {iterations()}
                             </div>
                         </div>

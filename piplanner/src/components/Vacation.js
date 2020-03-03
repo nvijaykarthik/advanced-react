@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../App.css';
-
+import Loader from './Loader';
 export default class Vacation extends Component {
     state = {
         piplanners: [],
@@ -28,38 +28,52 @@ export default class Vacation extends Component {
             vacationType: "",
             itrNo: "",
             teamMemberName: ""
-        }
+        },
+        loader:false
     }
 
     componentDidMount() {
-        fetch("http://localhost:8080/api/portfolio")
-            .then((response) => response.json())
-            .then((data) => {
-
-                this.setState({
-                    portfolio: data
-                })
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-
+        this.getYears()
+        this.getPortfolio();
+    }
+    getYears() {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getConfiguredYears")
             .then((response) => response.json())
             .then((data) => {
                 // //console.log('Success:', data);
                 this.setState({
-                    years: data
+                    years: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
-
+    }
+    getPortfolio() {
+        this.setState({ loader: true })
+        fetch("http://localhost:8080/api/portfolio")
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    portfolio: data,
+                    loader:false
+                })
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                this.setState({ loader: false })
+            });
     }
 
     onChangeYear(evt) {
-        this.setState({ selectedYear: evt.target.value })
+        this.setState({ selectedYear: evt.target.value, showPlan: false, selectedProgram: "", selectTeam: "", selectTeamName: "", programs: [], teams: [], portfolio: [] });
+        for(let i=0;i<10000;i++){
+            //introducing sync delay to make the async call work toload the buttons correctly
+        }
+        this.getPortfolio();
     }
     onChangePortfolio(evt) {
         let piplan = { ...this.state.piplan };
@@ -72,42 +86,51 @@ export default class Vacation extends Component {
         if (this.state.selectedYear === "") {
             alert("Please select the year");
         }
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    programs: data
+                    programs: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     loadTeamForPortfolio(portfolioId) {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/teamsForPortfolio?portfolioId=" + portfolioId)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    teams: data
+                    teams: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     loadIterationForProgram(prgId) {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + prgId)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    itrs: data
+                    itrs: data,
+                    loader:false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     onChangeProgram(evt) {
@@ -135,31 +158,37 @@ export default class Vacation extends Component {
             alert("please select the team")
             return;
         }
-
+        this.setState({ loader: true })
         //get vacation plan
         fetch("http://localhost:8080/api/getVacations?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam + "&portfolioId=" + this.state.selectedPortfolio)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
-                    vacation: data
+                    vacation: data,
+                    loader:false
                 })
+                this.getCapacity();
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     getCapacity() {
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
                 this.setState({
-                    capacity: data
+                    capacity: data,
+                    loader:false
                 })
                 this.refreshLoad()
             })
             .catch((error) => {
                 console.error('Error:', error);
+                this.setState({ loader: false })
             });
     }
     showSelectedVacation(member) {
@@ -179,6 +208,7 @@ export default class Vacation extends Component {
         let member = this.state.member
         console.log(member)
         let self = this
+        this.setState({ loader: true })
         fetch('http://localhost:8080/api/saveVacation', {
             method: 'post',
             body: JSON.stringify(member),
@@ -190,7 +220,8 @@ export default class Vacation extends Component {
         }).then(function (data) {
             self.btnLoadPlan()
             alert("Saved Succefully")
-            self.setState({ member: data })
+            self.setState({ member: data,loader:false })
+            self.getCapacity();
         });
     }
     render() {
@@ -223,11 +254,11 @@ export default class Vacation extends Component {
                 let stMn = months[Number(stDt[1]) - 1]
                 edDate = stDt[2] + "/" + stMn;
             }
-            return (<td className="pb-0" key={itr.id}>Itr{itr.itrNo}<br /><small className="text-dark">{stDate} to {edDate}</small></td>)
+            return (<td className="pb-0" key={itr.id}>Itr{itr.itrNo}<br /><small>{stDate} to {edDate}</small></td>)
         })
 
         let itrCapacityList = this.state.capacity.map(cp => {
-            return (<td className="pt-0" key={cp.itrId}><small className="text-dark">C:&nbsp;{cp.capacity},L:&nbsp;{cp.load},({cp.percent}%)</small></td>)
+            return (<td className="pt-0" key={cp.itrId}><small>C:&nbsp;{cp.capacity},L:&nbsp;{cp.load},({cp.percent}%)</small></td>)
         })
 
         let teamMemberVacation = () => {
@@ -263,8 +294,14 @@ export default class Vacation extends Component {
                 return <button type="button" className="btn btn-primary float-right" onClick={() => this.saveVacation()}>Save</button>
             }
         }
+        let loader = () => {
+            if (this.state.loader) {
+                return (<Loader />)
+            }
+        }
         return (
             <div className="container-fluid">
+                {loader()}
                 <div className="form-inline border-bottom">
                     <div className="m-2 ">
                         <i>Year:&nbsp;</i>
@@ -294,17 +331,17 @@ export default class Vacation extends Component {
                             {teamList}
                         </select>
                     </div>
-                    <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}>Load Plan</button>
+                    <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}><i class="fas fa-truck-loading"></i></button>
                 </div>
                 <div className="row mt-2">
                     <div className="col-md-6">
-                        <table className="table table-borderless">
-                            <thead>
-                                <tr>
+                        <table className="table table-striped shadow">
+                            <thead >
+                                <tr className="bg-dark text-white font-weight-bold">
                                     <td className="pb-0"><h1><i>{this.state.selectTeamName}</i></h1></td>
                                     {itrList}
                                 </tr>
-                                <tr>
+                                <tr className="bg-dark text-white font-weight-bold">
                                     <td className="pt-0"></td>
                                     {itrCapacityList}
                                 </tr>
@@ -315,8 +352,8 @@ export default class Vacation extends Component {
                         </table>
                     </div>
                     <div className="col-md-6">
-                        <div className="card">
-                            <div className="card-header bg-success text-white"><h5>Vacation Plan</h5></div>
+                        <div className="card shadow">
+                            <div className="card-header bg-info text-white"><h5>Vacation Plan</h5></div>
                             <div className="card-body">
                                 <h5 className="card-title">In Itr : &nbsp;{this.state.member.itrNo}</h5>
                                 <h6 className="card-subtitle mb-2 text-muted">For :&nbsp;{this.state.member.teamMemberName}</h6>

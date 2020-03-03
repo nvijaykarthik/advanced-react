@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../App.css';
-
+import Loader from './Loader';
 class Planner extends Component {
   state = {
     piplanners: [],
@@ -41,41 +41,55 @@ class Planner extends Component {
       commited: "",
       unCommited: "",
       risk: ""
-    }
+    },
+    loader:false
   }
 
 
 
 
   componentDidMount() {
-    fetch("http://localhost:8080/api/portfolio")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Success:', data);
-        this.setState({
-          portfolio: data
-        })
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
+    this.getYears()
+    this.getPortfolio();
+  }
+  getYears() {
+    this.setState({ loader: true })
     fetch("http://localhost:8080/api/getConfiguredYears")
       .then((response) => response.json())
       .then((data) => {
-        console.log('Success:', data);
+        // //console.log('Success:', data);
         this.setState({
-          years: data
+          years: data,
+          loader: false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader: false })
       });
-
+  }
+  getPortfolio() {
+    this.setState({ loader: true })
+    fetch("http://localhost:8080/api/portfolio")
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({
+          portfolio: data,
+          loader: false
+        })
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        this.setState({ loader: false })
+      });
   }
 
   onChangeYear(evt) {
-    this.setState({ selectedYear: evt.target.value })
+    this.setState({ selectedYear: evt.target.value, showPlan: false, selectedProgram: "", selectTeam: "", selectTeamName: "", programs: [], teams: [], portfolio: [] });
+    for (let i = 0; i < 10000; i++) {
+      //introducing sync delay to make the async call work toload the buttons correctly
+    }
+    this.getPortfolio();
   }
   onChangePortfolio(evt) {
     let piplan = { ...this.state.piplan };
@@ -88,42 +102,51 @@ class Planner extends Component {
     if (this.state.selectedYear === "") {
       alert("Please select the year");
     }
+    this.setState({ loader: true })
     fetch("http://localhost:8080/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
         this.setState({
-          programs: data
+          programs: data,
+          loader:false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader: false })
       });
   }
   loadTeamForPortfolio(portfolioId) {
+    this.setState({ loader: true })
     fetch("http://localhost:8080/api/teamsForPortfolio?portfolioId=" + portfolioId)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
         this.setState({
-          teams: data
+          teams: data,
+          loader:false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader: false })
       });
   }
   loadIterationForProgram(prgId) {
+    this.setState({ loader: true })
     fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + prgId)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
         this.setState({
-          itrs: data
+          itrs: data,
+          loader:false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader: false })
       });
   }
 
@@ -136,11 +159,11 @@ class Planner extends Component {
   onChangeTeam(evt) {
     let piplan = { ...this.state.piplan };
     piplan.teamId = evt.target.value;
-    let tName=this.state.teams.find(t=>{
-        return t.id==evt.target.value
+    let tName = this.state.teams.find(t => {
+      return t.id == evt.target.value
     })
-    this.setState({ selectTeam: evt.target.value, piplan, showPlan: false, selectTeamName:tName.name});
-}
+    this.setState({ selectTeam: evt.target.value, piplan, showPlan: false, selectTeamName: tName.name });
+  }
 
   btnLoadPlan() {
     if (this.state.selectedProgram === "") {
@@ -151,31 +174,36 @@ class Planner extends Component {
       alert("please select the team")
       return;
     }
+    this.setState({ loader: true })
     fetch("http://localhost:8080/api/getPiPlanners?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
         this.setState({
           piplanners: data,
-          showPlan: true
+          showPlan: true,
+          loader:false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader: false })
       });
-
+      this.setState({ loader: true })
     fetch("http://localhost:8080/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
         this.setState({
-          capacity: data
+          capacity: data,
+          loader:false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader: false })
       });
-
+      this.setState({ loader: true })
     fetch("http://localhost:8080/api/getProgramGoalForTeam?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
       .then((response) => response.json())
       .then((data) => {
@@ -188,11 +216,13 @@ class Planner extends Component {
           data.portfolioId = this.state.selectedPortfolio
         }
         this.setState({
-          programGoal: data
+          programGoal: data,
+          loader:false
         })
       })
       .catch((error) => {
         console.error('Error:', error);
+        this.setState({ loader:  false})
       });
   }
 
@@ -267,6 +297,7 @@ class Planner extends Component {
       return
     }
     let self = this
+    this.setState({ loader: true })
     fetch('http://localhost:8080/api/savePiPlanner', {
       method: 'post',
       body: JSON.stringify(piplan),
@@ -280,6 +311,7 @@ class Planner extends Component {
       self.btnLoadPlan()
       alert("Saved Succefully")
       self.refreshLoad()
+      self.setState({ loader: false })
     });
   }
 
@@ -374,6 +406,7 @@ class Planner extends Component {
     }
 
     let self = this
+    this.setState({ loader: true })
     fetch('http://localhost:8080/api/saveProgramGoal', {
       method: 'post',
       body: JSON.stringify(programGoal),
@@ -383,7 +416,7 @@ class Planner extends Component {
     }).then(function (response) {
       return response.json();
     }).then(function (data) {
-      self.setState({ programGoal })
+      self.setState({ programGoal,loader:false })
       alert("Saved Succefully")
     });
   }
@@ -404,7 +437,7 @@ class Planner extends Component {
           <td>{pi.storyPoints}</td>
           <td>{itNo}</td>
           <td>{pi.comments}</td>
-          <td><button className="btn btn-sm btn-warning" onClick={() => this.editPlan(pi)} data-toggle="modal" data-target="#featurePopup">edit</button></td>
+          <td><button className="btn btn-sm btn-warning" onClick={() => this.editPlan(pi)} data-toggle="modal" data-target="#featurePopup"><i className="fas fa-edit"></i>&nbsp;edit</button></td>
         </tr>
       )
     })
@@ -434,14 +467,14 @@ class Planner extends Component {
         return (
           <div className="row">
             <div className="col-md-10">
-              <div className="card">
+              <div className="card shadow">
                 <div className="card-body">
-                 <div className="clearfix"><span className="teamname">{this.state.selectTeamName}</span>
-                 <button type="button" className="btn btn-primary btn-sm float-right mb-1" onClick={() => this.btnNewPlan()} data-toggle="modal" data-target="#featurePopup">New Feature</button>
-                 </div>
-                  <table className="table table-bordered">
-                    <thead className="thead-dark">
-                      <tr>
+                  <div className="clearfix"><span className="teamname">{this.state.selectTeamName}</span>
+                    <button type="button" className="btn btn-primary btn-sm float-right mb-1" onClick={() => this.btnNewPlan()} data-toggle="modal" data-target="#featurePopup"><i class="fas fa-plus"></i>&nbsp;New Feature</button>
+                  </div>
+                  <table className="table table-bordered table-striped">
+                    <thead >
+                      <tr className="bg-dark text-white">
                         <th>FeatureId</th>
                         <th>Story No</th>
                         <th>Description</th>
@@ -459,9 +492,9 @@ class Planner extends Component {
               </div>
             </div>
             <div className="col-md-2">
-              <div className="card">
+              <div className="card shadow">
                 <div className="card-body">
-                  <b>Summary</b>&nbsp;<button className="btn btn-warning btn-sm" onClick={() => this.refreshLoad()}>refresh</button>
+                  <b>Summary</b>&nbsp;<button className="btn btn-warning btn-sm" onClick={() => this.refreshLoad()}><i class="fas fa-sync-alt"></i>&nbsp;refresh</button>
                   <ul className="summaryList">
                     {itrCapacityList}
                   </ul>
@@ -479,7 +512,7 @@ class Planner extends Component {
       if (this.state.showPlan === true) {
         return (<div className="row">
           <div className="col-md-4">
-            <div className="card">
+            <div className="card shadow">
               <div className="card-header bg-primary text-white">PI Ojective </div>
               <div className="card-body">
                 <textarea className="form-control" id="piobj" rows="10" value={this.state.programGoal.piObjective}
@@ -488,14 +521,14 @@ class Planner extends Component {
             </div>
           </div>
           <div className="col-md-4">
-            <div className="card">
+            <div className="card shadow">
               <div className="card-header bg-success text-white">Commited </div>
               <div className="card-body">
                 <textarea className="form-control" id="commited" rows="5" value={this.state.programGoal.commited}
                   onChange={(e) => this.onchangeCommited(e)}></textarea>
               </div>
             </div>
-            <div className="card  mt-2">
+            <div className="card  mt-2 shadow">
               <div className="card-header bg-secondary text-white">UnCommited </div>
               <div className="card-body">
                 <textarea className="form-control" id="uncommited" rows="5" value={this.state.programGoal.unCommited}
@@ -504,7 +537,7 @@ class Planner extends Component {
             </div>
           </div>
           <div className="col-md-4">
-            <div className="card">
+            <div className="card shadow">
               <div className="card-header bg-danger text-white">Risk </div>
               <div className="card-body">
                 <textarea className="form-control" id="risk" rows="10" value={this.state.programGoal.risk}
@@ -519,14 +552,20 @@ class Planner extends Component {
     }
     let saveGoalBtn = () => {
       if (this.state.showPlan === true) {
-        return (<button className="btn btn-primary float-right" onClick={() => this.saveGoals()}>Save Goals</button>)
+        return (<button className="btn btn-primary float-right" onClick={() => this.saveGoals()}><i class="fas fa-save"></i>&nbsp;Save Goals</button>)
       } else {
         return (null)
       }
     }
 
+    let loader = () => {
+      if (this.state.loader) {
+        return (<Loader />)
+      }
+    }
     return (
       <div className="container-fluid">
+        {loader()}
         <div className="form-inline border-bottom">
           <div className="m-2 ">
             <i>Year:&nbsp;</i>
@@ -556,7 +595,7 @@ class Planner extends Component {
               {teamList}
             </select>
           </div>
-          <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}>Load Plan</button>
+          <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}><i class="fas fa-truck-loading"></i></button>
           <a href="#plan" className="btn btn-sm ml-1 border-bottom">Plan</a>
           <a href="#goal" className="btn btn-sm ml-1 border-bottom">Goal</a>
         </div>
@@ -611,8 +650,8 @@ class Planner extends Component {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" className="btn btn-success float-right" onClick={() => this.savePlan()}>Save</button>
+                <button type="button" className="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i>&nbsp;Close</button>
+                <button type="button" className="btn btn-success float-right" onClick={() => this.savePlan()}><i class="fas fa-save"></i>&nbsp;Save</button>
               </div>
             </div>
           </div>

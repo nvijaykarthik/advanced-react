@@ -12,20 +12,26 @@ export default class Teams extends Component {
         newTeam: "",
         newMember: "",
         memberRole: "",
+        editedPortfolioId: "",
+        editedTeamId: "",
+        editedMemberId: "",
         portfolio: {
             createdBy: "",
-            name: ""
+            name: "",
+            id:""
         },
         team: {
             name: "",
             portfolioId: "",
-            createdBy: ""
+            createdBy: "",
+            id:""
         },
         member: {
             memberName: "",
             role: "",
             teamId: "",
-            createdBy: ""
+            createdBy: "",
+            id:""
         }
     }
 
@@ -73,12 +79,12 @@ export default class Teams extends Component {
     }
 
     onClickPortfolio(portfolio) {
-        this.setState({ teamMembers: [], selectedTeamId: "", selectedPortfolioId: portfolio.id })
+        this.setState({ teamMembers: [], selectedTeamId: "", selectedPortfolioId: portfolio.id, editedPortfolioId: "",newPortfolio:"", editedTeamId: "", newTeam: ""})
         this.loadTeamForPortfolio(portfolio.id);
     }
 
-    onClickTeams(team) {
-        this.setState({ selectedTeamId: team.id })
+    onClickTeams(team) {        
+        this.setState({ editedMemberId: "", editedTeamId: "", newTeam: "", selectedTeamId: team.id, newMember:"",memberRole:"" })
         this.loadTeamMembers(team.id);
     }
 
@@ -92,6 +98,10 @@ export default class Teams extends Component {
         portfolio.createdBy = "User";
         portfolio.name = this.state.newPortfolio;
 
+        if(this.state.editedPortfolioId !== "") {
+            portfolio.id = this.state.editedPortfolioId
+        }
+
         fetch('http://localhost:8080/api/portfolio', {
             method: 'post',
             body: JSON.stringify(portfolio),
@@ -102,8 +112,8 @@ export default class Teams extends Component {
             return response.json();
         }).then((data) => {
             this.loadPortfolioList();
-            this.setState({ newPortfolio: "" })
-            alert("Portfolio Added Successfully")
+            this.setState({ newPortfolio: "" , editedPortfolioId: ""})
+            alert("Portfolio saved Successfully")
 
         });
 
@@ -123,6 +133,10 @@ export default class Teams extends Component {
         team.name = this.state.newTeam;
         team.portfolioId = this.state.selectedPortfolioId;
 
+        if(this.state.editedTeamId !== "") {
+            team.id = this.state.editedTeamId
+        }
+
         fetch('http://localhost:8080/api/teamsForPortfolio', {
             method: 'post',
             body: JSON.stringify(team),
@@ -133,8 +147,8 @@ export default class Teams extends Component {
             return response.json();
         }).then((data) => {
             this.loadTeamForPortfolio(this.state.selectedPortfolioId);
-            this.setState({ newTeam: "" })
-            alert("Team Added Successfully")
+            this.setState({ newTeam: "", editedTeamId: ""})
+            alert("Team saved Successfully")
 
         });
 
@@ -144,7 +158,7 @@ export default class Teams extends Component {
     }
     addNewMember() {
         if (this.state.newMember === "" || this.state.memberRole === "") {
-            alert("Please enter Team Member Name and Role")
+            alert("Please enter team member name and choose role")
             return;
         }
 
@@ -154,6 +168,10 @@ export default class Teams extends Component {
         member.role = this.state.memberRole;
         member.portfolioId = this.state.selectedPortfolioId;
         member.teamId = this.state.selectedTeamId;
+
+        if(this.state.editedMemberId !== "") {
+            member.id = this.state.editedMemberId
+        }
 
         fetch('http://localhost:8080/api/teamMembersForTeam', {
             method: 'post',
@@ -165,8 +183,8 @@ export default class Teams extends Component {
             return response.json();
         }).then((data) => {
             this.loadTeamMembers(this.state.selectedTeamId);
-            this.setState({ newMember: "", memberRole: "" })
-            alert("Team Member Added Successfully")
+            this.setState({ newMember: "", memberRole: "", editedMemberId: ""})
+            alert("Team Member saved Successfully")
 
         });
 
@@ -177,23 +195,26 @@ export default class Teams extends Component {
     onChangeRole(evt) {
         this.setState({ memberRole: evt.target.value })
     }
-    editPortfolio(po) {
-
+    editPortfolio(po, evt) {
+        this.setState( {portfolioTeams: [], teamMembers: [], selectedTeamId: "", editedTeamId: "", editedMemberId: "", selectedPortfolioId: "" ,newPortfolio: po.name, editedPortfolioId: po.id })
+        evt.stopPropagation()
     }
-    editTeam(et) {
-
+    editTeam(et, evt) {
+        this.setState( {teamMembers: [], selectedTeamId: "", editedMemberId: "", newTeam: et.name, editedTeamId: et.id })
+        evt.stopPropagation()
     }
-    editMember(tm) {
-
+    editMember(em, evt) {
+        this.setState( {newMember: em.memberName, memberRole: em.role, editedMemberId: em.id })
+        evt.stopPropagation()
     }
     render() {
         let portfolioList = this.state.portfolios.map(po => {
             return (
                 <tr>
                     <td>
-                        <span className={this.state.selectedPortfolioId == po.id ? "list-group-item list-group-item-action active" : "list-group-item list-group-item-action"} onClick={() => this.onClickPortfolio(po)} >
+                        <span className={this.state.selectedPortfolioId == po.id ? "list-group-item list-group-item-action active" : "list-group-item list-group-item-action"} onClick={() => this.onClickPortfolio(po)}>
                             <label>{po.name}</label>
-                            <button type="button" class="btn btn-warning btn-sm float-right" onClick={() => this.editPortfolio(po)}><i className="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-warning btn-sm float-right" onClick={this.editPortfolio.bind(this, po)}><i className="fas fa-edit"></i></button>
                         </span>
                     </td>
                 </tr>
@@ -205,7 +226,7 @@ export default class Teams extends Component {
                     <td>
                         <span className={this.state.selectedTeamId == pt.id ? "list-group-item list-group-item-action active" : "list-group-item list-group-item-action"} onClick={() => this.onClickTeams(pt)} >
                             <label>{pt.name}</label>
-                            <button type="button" class="btn btn-warning btn-sm float-right" onClick={() => this.editTeam(pt)}><i className="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-warning btn-sm float-right" onClick={this.editTeam.bind(this,pt)}><i className="fas fa-edit"></i></button>
                         </span>
                     </td>
                 </tr>
@@ -217,7 +238,7 @@ export default class Teams extends Component {
                     <td>
                         <span className="list-group-item" >
                             <label>{tm.memberName} - {tm.role}</label>
-                            <button type="button" class="btn btn-warning btn-sm float-right" onClick={() => this.editMember(tm)}><i className="fas fa-edit"></i></button>
+                            <button type="button" class="btn btn-warning btn-sm float-right" onClick={this.editMember.bind(this,tm)}><i className="fas fa-edit"></i></button>
                         </span>
                     </td>
                 </tr>
@@ -234,7 +255,9 @@ export default class Teams extends Component {
                         <div class="input-group">
                             <input className="form-control" type="text" value={this.state.newTeam} placeholder="Add Team" onChange={(evt) => this.onChangeTeam(evt)} />
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-dark btn-sm float-right" onClick={() => this.addNewTeam()}><i className="fas fa-plus"></i></button>
+                                <button type="button" className={this.state.editedTeamId === "" ? "btn btn-dark btn-sm float-right" : "btn btn-success btn-sm float-right"} 
+                                onClick={() => this.addNewTeam()}>
+                                    <i className={this.state.editedTeamId === "" ? "fas fa-plus" : "fas fa-save"}></i></button>
                             </div>
                         </div>
                     </td>
@@ -249,13 +272,21 @@ export default class Teams extends Component {
             }
             else {
                 return (
-
                     <td>
                         <div class="input-group">
-                            <input className="form-control" type="text" value={this.state.newMember} placeholder="Add Member" onChange={(evt) => this.onChangeMember(evt)}  />
-                            <input className="form-control" type="text" value={this.state.memberRole} placeholder="Role" onChange={(evt) => this.onChangeRole(evt)} />
+                            <input className="form-control" type="text" value={this.state.newMember} placeholder="Add Member" onChange={(evt) => this.onChangeMember(evt)} />
+                            <select className="form-control" id="roleList" value={this.state.memberRole} onChange={(evt) => this.onChangeRole(evt)}>
+                                <option value="">Choose Role</option>
+                                <option value="Dev">Dev</option>
+                                <option value="Test">Test</option>
+                                <option value="SM">SM</option>
+                                <option value="BA">BA</option>
+                                <option value="PO">PO</option>
+                            </select>
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-dark btn-sm float-right" onClick={() => this.addNewMember()}><i className="fas fa-plus"></i></button>
+                                <button type="button" className={this.state.editedMemberId === "" ? "btn btn-dark btn-sm float-right" : "btn btn-success btn-sm float-right"}
+                                onClick={() => this.addNewMember()}>
+                                    <i className={this.state.editedMemberId === "" ? "fas fa-plus" : "fas fa-save"}></i></button>
                             </div>
                         </div>
                     </td>
@@ -263,6 +294,20 @@ export default class Teams extends Component {
                 )
             }
 
+        }
+        let addPortfolio = () => {
+            return (
+                <td>
+                    <div class="input-group">
+                        <input className="form-control" type="text" value={this.state.newPortfolio} placeholder="Add Portfolio" onChange={(evt) => this.onChangePortfolio(evt)} />
+                        <div class="input-group-append">
+                         <button type="button" className= {this.state.editedPortfolioId === "" ? "btn btn-dark btn-sm float-right" : "btn btn-success btn-sm float-right"} 
+                         onClick={() => this.addNewPortfolio()}>
+                             <i className={this.state.editedPortfolioId === "" ? "fas fa-plus" : "fas fa-save"}></i></button>
+                        </div>
+                    </div>
+                </td>
+            )
         }
         return (
             <div className="container-fluid">
@@ -274,14 +319,7 @@ export default class Teams extends Component {
                             <th><h2>Portifolio</h2></th>
                         </tr>
                         <tr className="bg-info">
-                            <td>
-                                <div class="input-group">
-                                    <input className="form-control" type="text" value={this.state.newPortfolio} placeholder="Add Portfolio" onChange={(evt) => this.onChangePortfolio(evt)} />
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-dark btn-sm float-right" onClick={() => this.addNewPortfolio()}><i className="fas fa-plus"></i></button>
-                                    </div>
-                                </div>
-                            </td>
+                            {addPortfolio()}
                         </tr>
                     </thead>
                     <tbody>

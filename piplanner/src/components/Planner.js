@@ -460,7 +460,7 @@ class Planner extends Component {
     })
 
     let itrCapacityList = this.state.capacity.map(cp => {
-      return (<span key={cp.itrId}><li className="firstchild">ITR{cp.itrNo}&nbsp;({cp.percent}%)</li><ul className="subSummary"><li>Capacity:&nbsp;{cp.capacity}</li><li>Load:&nbsp;{cp.load}</li></ul></span>)
+      return (<span key={cp.itrId}><li className="firstchild ">ITR{cp.itrNo}&nbsp;({cp.percent}%)</li><ul className="subSummary"><li>Capacity:&nbsp;{cp.capacity}</li><li>Load:&nbsp;{cp.load}</li></ul></span>)
     })
     let planView = () => {
       if (this.state.showPlan === true) {
@@ -474,7 +474,7 @@ class Planner extends Component {
                   </div>
                   <table className="table table-bordered table-striped">
                     <thead >
-                      <tr className="bg-dark text-white">
+                      <tr className="darkThead text-white">
                         <th>FeatureId</th>
                         <th>Story No</th>
                         <th>Description</th>

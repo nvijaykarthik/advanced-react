@@ -337,11 +337,11 @@ export default class Vacation extends Component {
                     <div className="col-md-6">
                         <table className="table table-striped shadow">
                             <thead >
-                                <tr className="bg-dark text-white font-weight-bold">
+                                <tr className="darkThead text-white font-weight-bold">
                                     <td className="pb-0"><h1><i>{this.state.selectTeamName}</i></h1></td>
                                     {itrList}
                                 </tr>
-                                <tr className="bg-dark text-white font-weight-bold">
+                                <tr className="darkThead text-white font-weight-bold">
                                     <td className="pt-0"></td>
                                     {itrCapacityList}
                                 </tr>

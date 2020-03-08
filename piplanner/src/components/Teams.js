@@ -271,7 +271,7 @@ export default class Teams extends Component {
                     <table className="table adjust">
                     <thead>
                         <tr>
-                            <th><h2>Portifolio</h2></th>
+                            <th className="darkThead text-white"><h2 >Portifolio</h2></th>
                         </tr>
                         <tr className="bg-info">
                             <td>
@@ -291,7 +291,7 @@ export default class Teams extends Component {
                 <table className="table adjust-team">
                     <thead >
                         <tr>
-                            <th><h2>Teams</h2></th>
+                            <th className="darkThead text-white"><h2>Teams</h2></th>
                         </tr>
                         <tr className="bg-info">
                             {addTeam()}
@@ -304,7 +304,7 @@ export default class Teams extends Component {
                 <table className="table adjust-member">
                     <thead >
                         <tr>
-                            <th><h2>Team Members</h2></th>
+                            <th className="darkThead text-white"><h2>Team Members</h2></th>
                         </tr>
                         <tr className="bg-info">
                             {addTeamMember()}

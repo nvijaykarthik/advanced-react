@@ -43,7 +43,7 @@ export default class Home extends Component {
             unCommited: "",
             risk: ""
         },
-        loader:false
+        loader: false
     }
 
     componentDidMount() {
@@ -58,7 +58,7 @@ export default class Home extends Component {
                 // //console.log('Success:', data);
                 this.setState({
                     years: data,
-                    loader:false
+                    loader: false
                 })
             })
             .catch((error) => {
@@ -73,7 +73,7 @@ export default class Home extends Component {
             .then((data) => {
                 this.setState({
                     portfolio: data,
-                    loader:false
+                    loader: false
                 })
             })
             .catch((error) => {
@@ -84,7 +84,7 @@ export default class Home extends Component {
 
     onChangeYear(evt) {
         this.setState({ selectedYear: evt.target.value, showPlan: false, selectedProgram: "", selectTeam: "", selectTeamName: "", programs: [], teams: [], portfolio: [] });
-        for(let i=0;i<10000;i++){
+        for (let i = 0; i < 10000; i++) {
             //introducing sync delay to make the async call work toload the buttons correctly
         }
         this.getPortfolio();
@@ -107,7 +107,7 @@ export default class Home extends Component {
                 //console.log('Success:', data);
                 this.setState({
                     programs: data,
-                    loader:false
+                    loader: false
                 })
             })
             .catch((error) => {
@@ -123,7 +123,7 @@ export default class Home extends Component {
                 //console.log('Success:', data);
                 this.setState({
                     teams: data,
-                    loader:false
+                    loader: false
                 })
             })
             .catch((error) => {
@@ -139,12 +139,12 @@ export default class Home extends Component {
                 //console.log('Success:', data);
                 this.setState({
                     itrs: data,
-                    loader:false
+                    loader: false
                 })
             })
             .catch((error) => {
                 console.error('Error:', error);
-                this.setState({ loader: false})
+                this.setState({ loader: false })
             });
     }
     onChangeProgram(evt) {
@@ -182,7 +182,7 @@ export default class Home extends Component {
                 this.setState({
                     piplanners: data,
                     showPlan: true,
-                    loader:false
+                    loader: false
                 })
                 this.getCapacity()
             })
@@ -192,7 +192,7 @@ export default class Home extends Component {
             });
 
 
-            this.setState({ loader: true })
+        this.setState({ loader: true })
         fetch("http://localhost:8080/api/getProgramGoalForTeam?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
             .then((response) => response.json())
             .then((data) => {
@@ -206,7 +206,7 @@ export default class Home extends Component {
                 }
                 this.setState({
                     programGoal: data,
-                    loader:false
+                    loader: false
                 })
             })
             .catch((error) => {
@@ -222,7 +222,7 @@ export default class Home extends Component {
                 //console.log('Success:', data);
                 this.setState({
                     capacity: data,
-                    loader:false
+                    loader: false
                 })
                 this.refreshLoad()
             })
@@ -269,14 +269,14 @@ export default class Home extends Component {
                 if (pl.itrId === 0) {
                     groups['backlog'] = []
                 } else {
-                    groups[pl.itrId] = []
+                    groups[pl.itrNo] = []
                 }
             })
             piplanners.forEach(pl => {
                 if (pl.itrId === 0) {
                     groups['backlog'].push(pl)
                 } else {
-                    groups[pl.itrId].push(pl)
+                    groups[pl.itrNo].push(pl)
                 }
             })
             //console.log(groups)
@@ -315,11 +315,11 @@ export default class Home extends Component {
                 let stMn = months[Number(stDt[1]) - 1]
                 edDate = stDt[2] + "/" + stMn;
             }
-            return (<td className="pb-0" key={itr.id}>Itr{itr.itrNo}<br /><small className="text-dark">{stDate} to {edDate}</small></td>)
+            return (<td className="pb-0 darkThead text-white" key={itr.id}>Itr{itr.itrNo}<br /><small>{stDate} to {edDate}</small></td>)
         })
 
         let itrCapacityList = this.state.capacity.map(cp => {
-            return (<td className="pt-0" key={cp.itrId}><small className="text-dark">C:&nbsp;{cp.capacity},L:&nbsp;{cp.load},({cp.percent}%)</small></td>)
+            return (<td className="pt-0  darkThead text-white" key={cp.itrId}><small>C:&nbsp;{cp.capacity},L:&nbsp;{cp.load},({cp.percent}%)</small></td>)
         })
 
         let grps = () => {
@@ -341,7 +341,13 @@ export default class Home extends Component {
             return
         }
         let itrGrps = () => {
+            let itrMap = {}
+            this.state.itrs.forEach(itr => {
+                itrMap[itr.itrNo] = <td className="border-right" key={itr.id}></td>
+            })
+            console.log(itrMap);
             let groups = this.getGroupedPlann()
+            console.log(groups);
             if (groups !== "") {
                 let view = []
                 let i = 0
@@ -352,20 +358,29 @@ export default class Home extends Component {
                             let desc = bk.description
                             if (desc !== "" && desc.length > 50)
                                 desc = desc.substring(0, 50) + "..."
-                            return (<div key={bk.id} className="stories rounded shadow">
+                            return (<div key={bk.id} title={bk.itrNo} className="stories rounded shadow">
                                 <p className="features">#{bk.featureId}-#{bk.storyNumber}</p>
                                 <p className="desc">{desc}</p>
-                                <p className="points"><span className="numberCircle">{bk.storyPoints}</span></p>
+                                <p className="points"><span className="numberCircle bg-info text-white" title="Iteration Number">{bk.itrNo}</span>&nbsp;<span className="numberCircle" title="Story Points">{bk.storyPoints}</span></p>
                             </div>
                             )
                         })
-
                         i++;
-                        view.push(<td key={i} className="border-right">
-                            {ret}
-                        </td>)
+                        view[key] = <td key={i} className="border-right">{ret}</td>
                     }
                 }
+                for (let key in itrMap) {
+                    if (itrMap.hasOwnProperty(key)) {
+                        let v=view[key]
+                        let itrv=itrMap[key]
+                        console.log(itrv)
+                        if(typeof v ==='undefined'){
+                            v=itrMap[key]
+                           view[key]=v
+                        }
+                    }
+                }
+                console.log(view)               
                 return view;
             }
             return
@@ -407,18 +422,18 @@ export default class Home extends Component {
                             {teamList}
                         </select>
                     </div>
-                    <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}><i class="fas fa-truck-loading"></i></button>
+                    <button className="btn btn-primary" onClick={() => this.btnLoadPlan()}><i className="fas fa-truck-loading"></i></button>
                 </div>
                 <div className="row mt-2">
                     <div className="col-md-12">
                         <table className="table table-borderless">
                             <thead>
                                 <tr>
-                                    <td className="pb-0"><h1><i>{this.state.selectTeamName}</i></h1></td>
+                                    <td className="pb-0 darkThead text-white"><h1><i>{this.state.selectTeamName}</i></h1></td>
                                     {itrList}
                                 </tr>
                                 <tr>
-                                    <td className="pt-0"></td>
+                                    <td className="pt-0 darkThead text-white"></td>
                                     {itrCapacityList}
                                 </tr>
                             </thead>
@@ -427,19 +442,20 @@ export default class Home extends Component {
                                     <td className="border-right">
                                         <div className="piObj p-2 m-2 shadow">
                                             <i>Objective</i><br />
-                                            {this.state.programGoal.piObjective}
+                                            <textarea rows="5" className="viewOnlyTxtArea form-control" value={this.state.programGoal.piObjective}/>
+                                            
                                         </div>
                                         <div className="piCom p-2 m-2 shadow">
                                             <i>Commited</i><br />
-                                            {this.state.programGoal.commited}
+                                            <textarea rows="5" className="viewOnlyTxtArea form-control" value={this.state.programGoal.commited}/>
                                         </div>
                                         <div className="piUncom p-2 m-2 shadow">
                                             <i>uncommited</i><br />
-                                            {this.state.programGoal.unCommited}
+                                            <textarea rows="5" className="viewOnlyTxtArea form-control" value={this.state.programGoal.unCommited}/>
                                         </div>
                                         <div className="piRis p-2 m-2 shadow">
                                             <i>risk</i><br />
-                                            {this.state.programGoal.risk}
+                                            <textarea rows="5" className="viewOnlyTxtArea form-control" value={this.state.programGoal.risk}/>
                                         </div>
                                         <div className="piBklog p-2 mt-3 shadow">
                                             <i>backlog</i><br />

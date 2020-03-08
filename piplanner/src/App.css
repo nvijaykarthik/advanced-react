@@ -78,15 +78,15 @@
 }
 .stories .features{
   font-size: 14px;
-  border-bottom:solid 1px #f2f2f2;
+  border-bottom:solid 1px #f1f13c;
   margin:0;
   padding:2px;
-  color:grey;
+  color:#211896;
   font-style: italic;
 }
 .stories .desc{
   font-size: 13px;
-  border-bottom:solid 1px #f2f2f2;
+  border-bottom:solid 1px #f1f13c;
   height:50px;
   margin:0;
   padding:2px;
@@ -107,7 +107,6 @@
 }
 
 .piRis{
-  font-size: 13px;
   background:rgb(255, 126, 122);
   border:solid 1px rgb(255, 77, 77);
   margin-bottom:5px;
@@ -121,7 +120,7 @@
   margin-bottom:5px;
   width:180px;
   padding:2px;
-  font-size: 13px;
+  
 }
 .piObj{
   background:rgb(122, 217, 255);
@@ -129,7 +128,7 @@
   margin-bottom:5px;
   width:180px;
   padding:2px;
-  font-size: 13px;
+  
 }
 
 .center {
@@ -151,4 +150,13 @@ div.loader {
   font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 10px;
+}
+
+.darkThead{
+  background-color: #3d635a;
+}
+
+.viewOnlyTxtArea{
+  background-color: white;
+  font-size: 13px;
 }

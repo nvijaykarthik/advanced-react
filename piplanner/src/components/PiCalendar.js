@@ -295,7 +295,7 @@ export default class PiCalendar extends Component {
                 let thead = () => {
                     return (
                         <thead className="thead-light">
-                            <tr className="bg-dark text-white font-weight-bold">
+                            <tr className="darkThead text-white font-weight-bold">
                                 <td>PI NO</td>
                                 <td>Start Date</td>
                                 <td>End Date</td>
@@ -341,7 +341,7 @@ export default class PiCalendar extends Component {
                 let thead = () => {
                     return (
                         <thead className="thead-light">
-                            <tr className="bg-dark text-white font-weight-bold">
+                            <tr className="darkThead text-white font-weight-bold">
                                 <td>Iteration No</td>
                                 <td>Start Date</td>
                                 <td>End Date</td>

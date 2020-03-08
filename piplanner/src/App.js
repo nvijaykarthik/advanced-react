@@ -29,9 +29,9 @@ const Menu = () => (
             <div className="navbar-nav mr-auto">
                 <Link to='/' className='nav-item nav-link'>Home</Link>
                 <Link to='/teams' className='nav-item nav-link'>Teams</Link>
-                <Link to='/proPlann' className='nav-item nav-link'>Program Planner</Link>
-                <Link to='/vacation' className='nav-item nav-link'>Vacation</Link>
                 <Link to='/piCalendar' className='nav-item nav-link'>PI Calendar</Link>
+                <Link to='/vacation' className='nav-item nav-link'>Vacation</Link>
+                <Link to='/proPlann' className='nav-item nav-link'>Program Planner</Link>
             </div>
         </div>
     </nav>

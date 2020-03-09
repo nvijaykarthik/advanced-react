@@ -40,7 +40,7 @@ export default class Teams extends Component {
     }
 
     loadPortfolioList() {
-        fetch("http://localhost:8080/api/portfolio")
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/portfolio")
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
@@ -53,7 +53,7 @@ export default class Teams extends Component {
     }
 
     loadTeamForPortfolio(portfolioId) {
-        fetch("http://localhost:8080/api/teamsForPortfolio?portfolioId=" + portfolioId)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/teamsForPortfolio?portfolioId=" + portfolioId)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
@@ -66,7 +66,7 @@ export default class Teams extends Component {
     }
 
     loadTeamMembers(teamId) {
-        fetch("http://localhost:8080/api/teamMembersForTeam?teamId=" + teamId)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/teamMembersForTeam?teamId=" + teamId)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({

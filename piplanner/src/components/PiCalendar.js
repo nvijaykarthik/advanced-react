@@ -42,7 +42,7 @@ export default class PiCalendar extends Component {
 
     componentDidMount() {
         this.setState({ loader: true })
-        fetch("http://localhost:8080/api/portfolio")
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/portfolio")
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
@@ -68,7 +68,7 @@ export default class PiCalendar extends Component {
             alert("Please enter the year");
         }
         this.setState({ loader: true })
-        fetch("http://localhost:8080/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.year)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.year)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
@@ -109,7 +109,7 @@ export default class PiCalendar extends Component {
     createPiCalendar() {
         this.setState({ loader: true })
         let self = this
-        fetch("http://localhost:8080/api/createProgramCalendar?portfolioId=" + this.state.selecedPortfolioId + "&fiYear=" + this.state.year, {
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/createProgramCalendar?portfolioId=" + this.state.selecedPortfolioId + "&fiYear=" + this.state.year, {
             method: 'post',
             headers: {
                 "Content-Type": "application/json"
@@ -179,7 +179,7 @@ export default class PiCalendar extends Component {
         this.fetchItr(progId)
     }
     fetchItr(progId) {
-        fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + progId)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getIterationCalendar?programPlanId=" + progId)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({

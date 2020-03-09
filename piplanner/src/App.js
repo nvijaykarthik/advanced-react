@@ -24,7 +24,7 @@ const Main = () => (
 
 const Menu = () => (
     <nav className='navbar navbar-expand-lg navbar-dark bg-primary'>
-        <span className="navbar-brand mb-0 h1" >Program Dashboard</span>
+        <span className="navbar-brand mb-0 h1" >Program Dashboard </span>
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav mr-auto">
                 <Link to='/' className='nav-item nav-link'>Home</Link>

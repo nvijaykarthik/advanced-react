@@ -54,7 +54,7 @@ class Planner extends Component {
   }
   getYears() {
     this.setState({ loader: true })
-    fetch("http://localhost:8080/api/getConfiguredYears")
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getConfiguredYears")
       .then((response) => response.json())
       .then((data) => {
         // //console.log('Success:', data);
@@ -70,7 +70,7 @@ class Planner extends Component {
   }
   getPortfolio() {
     this.setState({ loader: true })
-    fetch("http://localhost:8080/api/portfolio")
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/portfolio")
       .then((response) => response.json())
       .then((data) => {
         this.setState({
@@ -103,7 +103,7 @@ class Planner extends Component {
       alert("Please select the year");
     }
     this.setState({ loader: true })
-    fetch("http://localhost:8080/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
@@ -119,7 +119,7 @@ class Planner extends Component {
   }
   loadTeamForPortfolio(portfolioId) {
     this.setState({ loader: true })
-    fetch("http://localhost:8080/api/teamsForPortfolio?portfolioId=" + portfolioId)
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/teamsForPortfolio?portfolioId=" + portfolioId)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
@@ -135,7 +135,7 @@ class Planner extends Component {
   }
   loadIterationForProgram(prgId) {
     this.setState({ loader: true })
-    fetch("http://localhost:8080/api/getIterationCalendar?programPlanId=" + prgId)
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getIterationCalendar?programPlanId=" + prgId)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
@@ -175,7 +175,7 @@ class Planner extends Component {
       return;
     }
     this.setState({ loader: true })
-    fetch("http://localhost:8080/api/getPiPlanners?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getPiPlanners?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
@@ -190,7 +190,7 @@ class Planner extends Component {
         this.setState({ loader: false })
       });
       this.setState({ loader: true })
-    fetch("http://localhost:8080/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
       .then((response) => response.json())
       .then((data) => {
         console.log('Success:', data);
@@ -204,7 +204,7 @@ class Planner extends Component {
         this.setState({ loader: false })
       });
       this.setState({ loader: true })
-    fetch("http://localhost:8080/api/getProgramGoalForTeam?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
+    fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getProgramGoalForTeam?programId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
       .then((response) => response.json())
       .then((data) => {
         console.log('goal Success:', data);

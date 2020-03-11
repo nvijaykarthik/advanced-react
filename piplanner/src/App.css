@@ -160,3 +160,13 @@ div.loader {
   background-color: white;
   font-size: 13px;
 }
+
+.dependOn{
+  background: yellow;
+  border: 1px solid grey;
+  padding: 5px;
+  border-radius: 50%
+}
+.marginAuto{
+  margin: auto;
+}

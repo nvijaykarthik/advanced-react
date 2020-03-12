@@ -6,11 +6,11 @@ export default class DependencyConfig extends Component {
     state = {
         piplanners: [],
         portfolio: [],
-        selectedPortfolio: "",
+        selectedPortfolio: 0,
         programs: [],
         years: [],
-        selectedProgram: "",
-        selectedYear: "2020",
+        selectedProgram: 0,
+        selectedYear: 0,
         teams: [],
         dependentTeams: [],
         selectTeam: "",
@@ -52,6 +52,7 @@ export default class DependencyConfig extends Component {
             dependentFeature: "",
             dependentTeamItrId: 0
         },
+
         dependencyConfigs: [],
 
         loader: false
@@ -280,30 +281,7 @@ export default class DependencyConfig extends Component {
         });
         this.setState({ capacity: loadedCp })
     }
-    getGroupedPlann = () => {
-        let piplanners = this.state.piplanners;
-        if (piplanners.length > 0) {
-            let groups = {};
-            piplanners.forEach(pl => {
-                groups['backlog'] = []
-                if (pl.itrId === 0) {
-                    groups['backlog'] = []
-                } else {
-                    groups[pl.itrId] = []
-                }
-            })
-            piplanners.forEach(pl => {
-                if (pl.itrId === 0) {
-                    groups['backlog'].push(pl)
-                } else {
-                    groups[pl.itrId].push(pl)
-                }
-            })
-            //console.log(groups)
-            return groups
-        }
-        return "";
-    }
+ 
 
     onchangeMyFeature(e) {
         let dependencyConf = { ...this.state.dependencyConfig };
@@ -332,17 +310,14 @@ export default class DependencyConfig extends Component {
     }
 
     submitDependency() {
-        console.log('submitDependency' + this.state.dependencyConfig.year);
-        console.log('submitDependency' + this.state.dependencyConfig.portfolioId);
-        console.log('submitDependency' + this.state.dependencyConfig.programPlanId);
-        console.log('submitDependency' + this.state.dependencyConfig.dependentTeam);
-        console.log('submitDependency' + this.state.dependencyConfig.myTeam);
-        console.log('submitDependency' + this.state.dependencyConfig.myFeature);
-        console.log('submitDependency' + this.state.dependencyConfig.dependentFeature);
-        console.log('submitDependency' + this.state.dependencyConfig.myTeamItrId);
-        console.log('submitDependency' + this.state.dependencyConfig.dependentTeamItrId);
+   
 
         let dependencyConf = { ...this.state.dependencyConfig };
+         dependencyConf.year = this.state.selectedYear;
+        dependencyConf.portfolioId = this.state.selectedPortfolio;
+        dependencyConf.programPlanId = this.state.selectedProgram;
+        
+
         if (dependencyConf.dependentTeam === dependencyConf.myTeam) {
             alert("Dependent team cannnot be the same");
         }
@@ -357,7 +332,9 @@ export default class DependencyConfig extends Component {
         }).then(function (response) {
             return response.json();
         }).then(function (data) {
-            alert("Saved Succefully");
+            alert("Saved Succesfully");
+            self.setState({ dependencyConfig: data })
+            self.getDependencyMappings();
             self.setState({ loader: false })
         });
 
@@ -365,20 +342,61 @@ export default class DependencyConfig extends Component {
     }
     getDependencyMappings() {
         let self = this
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getDependencyMappings?year=" + this.state.selectedYear + "&portolioId=" + this.state.portfolioId + "&programPlanId=" + this.state.selectedProgram)
+        console.log('getDependencyMappings--' + "/api/getDependencyMappings?year=" + this.state.selectedYear + "&portolioId=" + this.state.selectedPortfolio + "&programPlanId=" + this.state.selectedProgram);
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getDependencyMappings?year=" + this.state.selectedYear + "&portolioId=" + this.state.selectedPortfolio + "&programPlanId=" + this.state.selectedProgram)
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
                     dependencyConfigs: data,
+
                     loader: false
                 });
-                
+
             })
             .catch((error) => {
                 console.error('Error:', error);
                 this.setState({ loader: false })
             });
 
+
+    }
+
+    createNewDependency() {
+        let dependencyConf = { ...this.state.dependencyConfig };
+        dependencyConf.id=0;
+        dependencyConf.year = 0;
+        dependencyConf.portfolioId = 0;
+        dependencyConf.portfolioName = "";
+        dependencyConf.programPlanId = 0;
+        dependencyConf.myTeam = "";
+        dependencyConf.myTeamId = 0;
+        dependencyConf.myFeature = "";
+        dependencyConf.myTeamItrId = 0;
+        dependencyConf.dependentTeam = "";
+        dependencyConf.dependentTeamId = 0;
+        dependencyConf.dependentFeature = "";
+        dependencyConf.dependentTeamItrId = 0;
+        this.setState({ dependencyConfig: dependencyConf });
+    }
+
+    editDependencyConf(selectedDependencyConfig, evt) {
+        console.log('editDependencyConf--', selectedDependencyConfig.dependentTeam);
+        console.log('editDependencyConf--', selectedDependencyConfig.dependentTeamId);
+        let selectedDependencyConf = { ...this.state.dependencyConfig };
+        selectedDependencyConf.year = this.state.selectedYear;
+        selectedDependencyConf.portfolioName = this.state.selectedPortfolio;
+        selectedDependencyConf.programPlanId = this.state.selectedProgram;
+        selectedDependencyConf.id = selectedDependencyConfig.id;
+        selectedDependencyConf.myTeam = selectedDependencyConfig.myTeam;
+        selectedDependencyConf.myTeamId = selectedDependencyConfig.myTeamId;
+        selectedDependencyConf.myFeature = selectedDependencyConfig.myFeature;
+        selectedDependencyConf.myTeamItrId = selectedDependencyConfig.myTeamItrId;
+        selectedDependencyConf.dependentTeam = selectedDependencyConfig.dependentTeam;
+        selectedDependencyConf.dependentTeamId = selectedDependencyConfig.dependentTeamId;
+        selectedDependencyConf.dependentFeature = selectedDependencyConfig.dependentFeature;
+        selectedDependencyConf.dependentTeamItrId = selectedDependencyConfig.dependentTeamItrId;
+
+        this.setState({ dependencyConfig: selectedDependencyConf });
 
     }
 
@@ -396,39 +414,37 @@ export default class DependencyConfig extends Component {
                 <option key={t.id} value={t.id}>{t.name}</option>
             )
         })
-        let dependentTeamList = this.state.dependentTeams.map(t => {
-            return (
-                <option key={t.id} value={t.id}>{t.name}</option>
-            )
-        })
+
         let yearList = this.state.years.map(yr => {
             return (<option key={yr} value={yr}>{yr}</option>)
         })
 
 
 
-        let grps = () => {
-            let groups = this.getGroupedPlann()
-            if (groups !== "") {
-                return groups.backlog.map(bk => {
-                    let desc = bk.description
-                    if (desc !== "" && desc.length > 30)
-                        desc = desc.substring(0, 30) + "..."
-                    return (<div key={bk.id} className="stories rounded">
-                        <p className="features">#{bk.featureId}-#{bk.storyNumber}</p>
-                        <p className="desc">{desc}</p>
-                        <p className="points">{bk.storyPoints}</p>
-                    </div>
-                    )
-                })
-
-            }
-            return
-        }
+        
 
         let iterationsSelectList = this.state.itrs.map(itr => {
             return (<option key={itr.id} value={itr.itrNo}>{itr.itrNo}</option>)
         })
+
+        let listdependencyConfigs = this.state.dependencyConfigs.map(dependencyConf => {
+            return (
+                <tr key={dependencyConf.id}>
+                    <td>{dependencyConf.myTeam}</td>
+                    <td>{dependencyConf.myFeature}</td>
+                    <td className="border-right">{dependencyConf.myTeamItrId}</td>
+                    <td>{dependencyConf.dependentTeam}</td>
+                    <td>{dependencyConf.dependentFeature}</td>
+                    <td>{dependencyConf.dependentTeamItrId}</td>
+                    <td>
+                        <div className="btn-group">
+                            <button className="btn btn-sm btn-warning" onClick={(evt) => this.editDependencyConf(dependencyConf, evt)}><i className="fas fa-edit"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            )
+        })
+
 
 
         let loader = () => {
@@ -469,7 +485,21 @@ export default class DependencyConfig extends Component {
                         <div className="card">
                             <div className="card-body">
                                 <h5 className="card-title">Dependency Mappings</h5>
-
+                                <table className="table">
+                                    <thead className="thead-light">
+                                        <tr className="darkThead text-white font-weight-bold">
+                                            <td>My Team</td>
+                                            <td>My Feature</td>
+                                            <td className="border-right">ItrNo</td>
+                                            <td>Dependent Team</td>
+                                            <td>Dependent Feature</td>
+                                            <td>ItrNo</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {listdependencyConfigs}
+                                    </tbody>
+                                </table>
 
                             </div>
                         </div>
@@ -483,8 +513,7 @@ export default class DependencyConfig extends Component {
                                     <div className="col-md-5">
                                         <div className="form-group">
                                             <label for="myteam">My Team:</label>
-
-                                            <select className="form-control" id="teamList" onChange={(evt) => this.onChangeTeam(evt)}>
+                                            <select className="form-control" id="myTeamList" value={this.state.dependencyConfig.myTeamId} onChange={(evt) => this.onChangeTeam(evt)}>
                                                 <option value=""></option>
                                                 {teamList}
                                             </select>
@@ -499,7 +528,7 @@ export default class DependencyConfig extends Component {
                                         <div className="form-group">
                                             <label for="myteam">Iterations:</label>
 
-                                            <select className="form-control" id="myIterations" onChange={(evt) => this.onChangeMyIterations(evt)}>
+                                            <select className="form-control" id="myIterations" value={this.state.dependencyConfig.myTeamItrId} onChange={(evt) => this.onChangeMyIterations(evt)}>
                                                 <option value=""></option>
                                                 {iterationsSelectList}
                                             </select>
@@ -509,9 +538,9 @@ export default class DependencyConfig extends Component {
                                     <div className="col-md-5">
                                         <div className="form-group">
                                             <label for="myteam">Dependent Team:</label>
-                                            <select className="form-control" id="dependentTeamList" onChange={(evt) => this.onChangeDependentTeam(evt)}>
+                                            <select className="form-control" id="dependentTeamList" value={this.state.dependencyConfig.dependentTeamId} onChange={(evt) => this.onChangeDependentTeam(evt)}>
                                                 <option value=""></option>
-                                                {dependentTeamList}
+                                                {teamList}
                                             </select>
                                         </div>
                                         <div className="form-group">
@@ -522,14 +551,22 @@ export default class DependencyConfig extends Component {
                                         <div className="form-group">
                                             <label for="myteam">Dependent Iterations:</label>
 
-                                            <select className="form-control" id="dependentIterations" onChange={(evt) => this.onChangeDependentIterations(evt)}>
+                                            <select className="form-control" id="dependentIterations" value={this.state.dependencyConfig.dependentTeamItrId} onChange={(evt) => this.onChangeDependentIterations(evt)}>
                                                 <option value=""></option>
                                                 {iterationsSelectList}
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <button className="btn btn-primary" onClick={() => this.submitDependency()}><i>Save</i></button>
+                                <div className="row">
+                                    <div className="col-md-1">
+                                        <button className="btn btn-primary" onClick={() => this.submitDependency()}><i>Save</i></button>
+                                    </div>
+                                    <div className="col-md-1">
+                                        <button className="btn btn-primary" onClick={() => this.createNewDependency()}><i>New</i></button>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
 

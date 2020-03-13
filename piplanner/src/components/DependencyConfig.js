@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import '../App.css';
 import Loader from './Loader';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
 export default class DependencyConfig extends Component {
     state = {
@@ -57,6 +59,8 @@ export default class DependencyConfig extends Component {
 
         loader: false
     }
+
+    //var Confirm = require('react-confirm-bootstrap');
 
     componentDidMount() {
         this.getYears()
@@ -281,7 +285,7 @@ export default class DependencyConfig extends Component {
         });
         this.setState({ capacity: loadedCp })
     }
- 
+
 
     onchangeMyFeature(e) {
         let dependencyConf = { ...this.state.dependencyConfig };
@@ -310,13 +314,13 @@ export default class DependencyConfig extends Component {
     }
 
     submitDependency() {
-   
+
 
         let dependencyConf = { ...this.state.dependencyConfig };
-         dependencyConf.year = this.state.selectedYear;
+        dependencyConf.year = this.state.selectedYear;
         dependencyConf.portfolioId = this.state.selectedPortfolio;
         dependencyConf.programPlanId = this.state.selectedProgram;
-        
+
 
         if (dependencyConf.dependentTeam === dependencyConf.myTeam) {
             alert("Dependent team cannnot be the same");
@@ -363,7 +367,7 @@ export default class DependencyConfig extends Component {
 
     createNewDependency() {
         let dependencyConf = { ...this.state.dependencyConfig };
-        dependencyConf.id=0;
+        dependencyConf.id = 0;
         dependencyConf.year = 0;
         dependencyConf.portfolioId = 0;
         dependencyConf.portfolioName = "";
@@ -400,6 +404,34 @@ export default class DependencyConfig extends Component {
 
     }
 
+     deleteDependencyConf(selectedDependencyConfig) {
+        console.log('deleteDependencyConf--', selectedDependencyConfig.id);
+        
+        let c=window.confirm("Do you want to delete?");
+        if(c){
+            console.log('Confirm--');
+             fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/removeDependencyMapping?id=" + selectedDependencyConfig.id)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    loader: false
+                });
+                this.getDependencyMappings();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                this.setState({ loader: false })
+            });
+        }
+        else{
+           console.log('NoConfirm--');
+        }
+    }
+
+    
+        
+    
+
 
 
     render() {
@@ -421,7 +453,7 @@ export default class DependencyConfig extends Component {
 
 
 
-        
+
 
         let iterationsSelectList = this.state.itrs.map(itr => {
             return (<option key={itr.id} value={itr.itrNo}>{itr.itrNo}</option>)
@@ -438,7 +470,10 @@ export default class DependencyConfig extends Component {
                     <td>{dependencyConf.dependentTeamItrId}</td>
                     <td>
                         <div className="btn-group">
-                            <button className="btn btn-sm btn-warning" onClick={(evt) => this.editDependencyConf(dependencyConf, evt)}><i className="fas fa-edit"></i></button>
+                            <button className="btn btn-sm btn-info" onClick={(evt) => this.editDependencyConf(dependencyConf, evt)}><i className="fas fa-edit"></i></button>
+                        </div>
+                        <div className="btn-group">
+                            <button className="btn btn-sm btn-warning" onClick={(evt) => this.deleteDependencyConf(dependencyConf)}><i className="fa fa-trash"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -452,6 +487,8 @@ export default class DependencyConfig extends Component {
                 return (<Loader />)
             }
         }
+
+      
         return (
             <div className="container-fluid">
                 {loader()}

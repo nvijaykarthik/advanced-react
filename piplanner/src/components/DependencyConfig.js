@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import '../App.css';
 import Loader from './Loader';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 
 export default class DependencyConfig extends Component {
     state = {
         piplanners: [],
         portfolio: [],
-        selectedPortfolio: "",
+        selectedPortfolio: 0,
         programs: [],
         years: [],
-        selectedProgram: "",
-        selectedYear: "2020",
+        selectedProgram: 0,
+        selectedYear: 0,
         teams: [],
         dependentTeams: [],
         selectTeam: "",
@@ -39,23 +41,26 @@ export default class DependencyConfig extends Component {
             teamId: 0
         },
         dependencyConfig: {
-            year:0,
+            year: 0,
             portfolioId: 0,
             portfolioName: "",
             programPlanId: 0,
-            myTeam:"",
+            myTeam: "",
             myTeamId: 0,
-            myFeature:"",
+            myFeature: "",
             myTeamItrId: 0,
-            dependentTeam:"",
+            dependentTeam: "",
             dependentTeamId: 0,
-            dependentFeature:"",
+            dependentFeature: "",
             dependentTeamItrId: 0
         },
-        dependencyConfigs:[],
+
+        dependencyConfigs: [],
 
         loader: false
     }
+
+    //var Confirm = require('react-confirm-bootstrap');
 
     componentDidMount() {
         this.getYears()
@@ -63,7 +68,7 @@ export default class DependencyConfig extends Component {
     }
     getYears() {
         this.setState({ loader: true })
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getConfiguredYears")
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getConfiguredYears")
             .then((response) => response.json())
             .then((data) => {
                 // //console.log('Success:', data);
@@ -79,7 +84,7 @@ export default class DependencyConfig extends Component {
     }
     getPortfolio() {
         this.setState({ loader: true })
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/portfolio")
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/portfolio")
             .then((response) => response.json())
             .then((data) => {
                 this.setState({
@@ -98,7 +103,7 @@ export default class DependencyConfig extends Component {
         for (let i = 0; i < 10000; i++) {
             //introducing sync delay to make the async call work toload the buttons correctly
         }
-         let dependencyConf = { ...this.state.dependencyConfig };
+        let dependencyConf = { ...this.state.dependencyConfig };
         dependencyConf.year = evt.target.value;
         this.setState({ dependencyConfig: dependencyConf });
         this.getPortfolio();
@@ -118,7 +123,7 @@ export default class DependencyConfig extends Component {
             alert("Please select the year");
         }
         this.setState({ loader: true })
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getProgramCalendar?portfolioId=" + portfolioId + "&fiYear=" + this.state.selectedYear)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
@@ -134,7 +139,7 @@ export default class DependencyConfig extends Component {
     }
     loadTeamForPortfolio(portfolioId) {
         this.setState({ loader: true })
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/teamsForPortfolio?portfolioId=" + portfolioId)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/teamsForPortfolio?portfolioId=" + portfolioId)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
@@ -150,7 +155,7 @@ export default class DependencyConfig extends Component {
     }
     loadIterationForProgram(prgId) {
         this.setState({ loader: true })
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getIterationCalendar?programPlanId=" + prgId)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getIterationCalendar?programPlanId=" + prgId)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
@@ -167,7 +172,7 @@ export default class DependencyConfig extends Component {
     onChangeProgram(evt) {
         let piplan = { ...this.state.piplan };
         piplan.programPlanId = evt.target.value;
-         let dependencyConf = { ...this.state.dependencyConfig };
+        let dependencyConf = { ...this.state.dependencyConfig };
         dependencyConf.programPlanId = evt.target.value;
         this.setState({ dependencyConfig: dependencyConf });
         this.setState({ selectedProgram: evt.target.value, piplan, showPlan: false });
@@ -176,9 +181,9 @@ export default class DependencyConfig extends Component {
     onChangeTeam(evt) {
         let piplan = { ...this.state.piplan };
         piplan.teamId = evt.target.value;
-         let dependencyConf = { ...this.state.dependencyConfig };
+        let dependencyConf = { ...this.state.dependencyConfig };
         dependencyConf.myTeamId = evt.target.value;
-        
+
         let tName = this.state.teams.find(t => {
             console.log(t.id + "=" + evt.target.value)
             return t.id == evt.target.value
@@ -193,7 +198,7 @@ export default class DependencyConfig extends Component {
     }
 
     onChangeDependentTeam(evt) {
-         let dependencyConf = { ...this.state.dependencyConfig };
+        let dependencyConf = { ...this.state.dependencyConfig };
         dependencyConf.dependentTeamId = evt.target.value;
 
         let tName = this.state.teams.find(t => {
@@ -234,7 +239,7 @@ export default class DependencyConfig extends Component {
 
     getCapacity() {
         this.setState({ loader: true })
-        fetch(process.env.REACT_APP_LOCAL_DOMAIN+"/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getCapacity?programPlanId=" + this.state.selectedProgram + "&teamId=" + this.state.selectTeam)
             .then((response) => response.json())
             .then((data) => {
                 //console.log('Success:', data);
@@ -280,69 +285,154 @@ export default class DependencyConfig extends Component {
         });
         this.setState({ capacity: loadedCp })
     }
-    getGroupedPlann = () => {
-        let piplanners = this.state.piplanners;
-        if (piplanners.length > 0) {
-            let groups = {};
-            piplanners.forEach(pl => {
-                groups['backlog'] = []
-                if (pl.itrId === 0) {
-                    groups['backlog'] = []
-                } else {
-                    groups[pl.itrId] = []
-                }
-            })
-            piplanners.forEach(pl => {
-                if (pl.itrId === 0) {
-                    groups['backlog'].push(pl)
-                } else {
-                    groups[pl.itrId].push(pl)
-                }
-            })
-            //console.log(groups)
-            return groups
-        }
-        return "";
-    }
+
 
     onchangeMyFeature(e) {
-    let dependencyConf = { ...this.state.dependencyConfig };
-    dependencyConf.myFeature = e.target.value;
-    this.setState({ dependencyConfig: dependencyConf });
-  }
-  onchangeDependentFeature(e) {
-    let dependencyConf = { ...this.state.dependencyConfig };
-    dependencyConf.dependentFeature = e.target.value;
-    this.setState({ dependencyConfig: dependencyConf });
-  }
+        let dependencyConf = { ...this.state.dependencyConfig };
+        dependencyConf.myFeature = e.target.value;
+        this.setState({ dependencyConfig: dependencyConf });
+    }
+    onchangeDependentFeature(e) {
+        let dependencyConf = { ...this.state.dependencyConfig };
+        dependencyConf.dependentFeature = e.target.value;
+        this.setState({ dependencyConfig: dependencyConf });
+    }
 
-  onChangeMyIterations(e) {
-     // console.log("onChangeMyIterations",e.target.value);
-    let dependencyConf = { ...this.state.dependencyConfig };
-    //let itrId = parseInt(e.target.value);
- //console.log("onChangeMyIterations",itrId);
-    dependencyConf.myTeamItrId = e.target.value;
-    this.setState({ dependencyConfig: dependencyConf });
-  }
+    onChangeMyIterations(e) {
+        // console.log("onChangeMyIterations",e.target.value);
+        let dependencyConf = { ...this.state.dependencyConfig };
+        //let itrId = parseInt(e.target.value);
+        //console.log("onChangeMyIterations",itrId);
+        dependencyConf.myTeamItrId = e.target.value;
+        this.setState({ dependencyConfig: dependencyConf });
+    }
 
-  onChangeDependentIterations(e) {
-    let dependencyConf = { ...this.state.dependencyConfig };
-    dependencyConf.dependentTeamItrId = e.target.value;
-    this.setState({ dependencyConfig: dependencyConf });
-  }
+    onChangeDependentIterations(e) {
+        let dependencyConf = { ...this.state.dependencyConfig };
+        dependencyConf.dependentTeamItrId = e.target.value;
+        this.setState({ dependencyConfig: dependencyConf });
+    }
 
-  submitDependency(){
-      console.log('submitDependency' + this.state.dependencyConfig.year);
-      console.log('submitDependency' + this.state.dependencyConfig.portfolioId);
-      console.log('submitDependency' + this.state.dependencyConfig.programPlanId);
-      console.log('submitDependency' + this.state.dependencyConfig.dependentTeam);
-      console.log('submitDependency' + this.state.dependencyConfig.myTeam);
-      console.log('submitDependency' + this.state.dependencyConfig.myFeature);
-      console.log('submitDependency' + this.state.dependencyConfig.dependentFeature);
-      console.log('submitDependency' + this.state.dependencyConfig.myTeamItrId);
-      console.log('submitDependency' + this.state.dependencyConfig.dependentTeamItrId);
-      //TODO
-  }
+    submitDependency() {
+
+
+        let dependencyConf = { ...this.state.dependencyConfig };
+        dependencyConf.year = this.state.selectedYear;
+        dependencyConf.portfolioId = this.state.selectedPortfolio;
+        dependencyConf.programPlanId = this.state.selectedProgram;
+
+
+        if (dependencyConf.dependentTeam === dependencyConf.myTeam) {
+            alert("Dependent team cannnot be the same");
+        }
+        let self = this
+        this.setState({ loader: true })
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + '/api/savePiDependencyMapping', {
+            method: 'post',
+            body: JSON.stringify(dependencyConf),
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            alert("Saved Succesfully");
+            self.setState({ dependencyConfig: data })
+            self.getDependencyMappings();
+            self.setState({ loader: false })
+        });
+
+
+    }
+    getDependencyMappings() {
+        let self = this
+        console.log('getDependencyMappings--' + "/api/getDependencyMappings?year=" + this.state.selectedYear + "&portolioId=" + this.state.selectedPortfolio + "&programPlanId=" + this.state.selectedProgram);
+        fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/getDependencyMappings?year=" + this.state.selectedYear + "&portolioId=" + this.state.selectedPortfolio + "&programPlanId=" + this.state.selectedProgram)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    dependencyConfigs: data,
+
+                    loader: false
+                });
+
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                this.setState({ loader: false })
+            });
+
+
+    }
+
+    createNewDependency() {
+        let dependencyConf = { ...this.state.dependencyConfig };
+        dependencyConf.id = 0;
+        dependencyConf.year = 0;
+        dependencyConf.portfolioId = 0;
+        dependencyConf.portfolioName = "";
+        dependencyConf.programPlanId = 0;
+        dependencyConf.myTeam = "";
+        dependencyConf.myTeamId = 0;
+        dependencyConf.myFeature = "";
+        dependencyConf.myTeamItrId = 0;
+        dependencyConf.dependentTeam = "";
+        dependencyConf.dependentTeamId = 0;
+        dependencyConf.dependentFeature = "";
+        dependencyConf.dependentTeamItrId = 0;
+        this.setState({ dependencyConfig: dependencyConf });
+    }
+
+    editDependencyConf(selectedDependencyConfig, evt) {
+        console.log('editDependencyConf--', selectedDependencyConfig.dependentTeam);
+        console.log('editDependencyConf--', selectedDependencyConfig.dependentTeamId);
+        let selectedDependencyConf = { ...this.state.dependencyConfig };
+        selectedDependencyConf.year = this.state.selectedYear;
+        selectedDependencyConf.portfolioName = this.state.selectedPortfolio;
+        selectedDependencyConf.programPlanId = this.state.selectedProgram;
+        selectedDependencyConf.id = selectedDependencyConfig.id;
+        selectedDependencyConf.myTeam = selectedDependencyConfig.myTeam;
+        selectedDependencyConf.myTeamId = selectedDependencyConfig.myTeamId;
+        selectedDependencyConf.myFeature = selectedDependencyConfig.myFeature;
+        selectedDependencyConf.myTeamItrId = selectedDependencyConfig.myTeamItrId;
+        selectedDependencyConf.dependentTeam = selectedDependencyConfig.dependentTeam;
+        selectedDependencyConf.dependentTeamId = selectedDependencyConfig.dependentTeamId;
+        selectedDependencyConf.dependentFeature = selectedDependencyConfig.dependentFeature;
+        selectedDependencyConf.dependentTeamItrId = selectedDependencyConfig.dependentTeamItrId;
+
+        this.setState({ dependencyConfig: selectedDependencyConf });
+
+    }
+
+     deleteDependencyConf(selectedDependencyConfig) {
+        console.log('deleteDependencyConf--', selectedDependencyConfig.id);
+        
+        let c=window.confirm("Do you want to delete?");
+        if(c){
+            console.log('Confirm--');
+             fetch(process.env.REACT_APP_LOCAL_DOMAIN + "/api/removeDependencyMapping?id=" + selectedDependencyConfig.id)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    loader: false
+                });
+                this.getDependencyMappings();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                this.setState({ loader: false })
+            });
+        }
+        else{
+           console.log('NoConfirm--');
+        }
+    }
+
+    
+        
+    
+
+
 
     render() {
         let portfolioList = this.state.portfolio.map(po => {
@@ -356,123 +446,170 @@ export default class DependencyConfig extends Component {
                 <option key={t.id} value={t.id}>{t.name}</option>
             )
         })
-        let dependentTeamList = this.state.dependentTeams.map(t => {
-            return (
-                <option key={t.id} value={t.id}>{t.name}</option>
-            )
-        })
+
         let yearList = this.state.years.map(yr => {
             return (<option key={yr} value={yr}>{yr}</option>)
         })
-    
 
 
-        let grps = () => {
-            let groups = this.getGroupedPlann()
-            if (groups !== "") {
-                return groups.backlog.map(bk => {
-                    let desc = bk.description
-                    if (desc !== "" && desc.length > 30)
-                        desc = desc.substring(0, 30) + "..."
-                    return (<div key={bk.id} className="stories rounded">
-                        <p className="features">#{bk.featureId}-#{bk.storyNumber}</p>
-                        <p className="desc">{desc}</p>
-                        <p className="points">{bk.storyPoints}</p>
-                    </div>
-                    )
-                })
 
-            }
-            return
-        }
 
-          let iterationsSelectList = this.state.itrs.map(itr => {
-                    return (<option key={itr.id} value={itr.itrNo}>{itr.itrNo}</option>)
+
+        let iterationsSelectList = this.state.itrs.map(itr => {
+            return (<option key={itr.id} value={itr.itrNo}>{itr.itrNo}</option>)
         })
-        
+
+        let listdependencyConfigs = this.state.dependencyConfigs.map(dependencyConf => {
+            return (
+                <tr key={dependencyConf.id}>
+                    <td>{dependencyConf.myTeam}</td>
+                    <td>{dependencyConf.myFeature}</td>
+                    <td className="border-right">{dependencyConf.myTeamItrId}</td>
+                    <td>{dependencyConf.dependentTeam}</td>
+                    <td>{dependencyConf.dependentFeature}</td>
+                    <td>{dependencyConf.dependentTeamItrId}</td>
+                    <td>
+                        <div className="btn-group">
+                            <button className="btn btn-sm btn-info" onClick={(evt) => this.editDependencyConf(dependencyConf, evt)}><i className="fas fa-edit"></i></button>
+                        </div>
+                        <div className="btn-group">
+                            <button className="btn btn-sm btn-warning" onClick={(evt) => this.deleteDependencyConf(dependencyConf)}><i className="fa fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            )
+        })
+
+
 
         let loader = () => {
             if (this.state.loader) {
                 return (<Loader />)
             }
         }
+
+      
         return (
             <div className="container-fluid">
                 {loader()}
                 <div className="form-inline border-bottom">
                     <div className="m-2 ">
                         <i>Year:&nbsp;</i>
-                        <select className="form-control" id="portfolioList" onChange={(evt) => this.onChangeYear(evt)}>
+                        <select className="form-control" id="year" onChange={(evt) => this.onChangeYear(evt)}>
                             <option value=""></option>
                             {yearList}
                         </select>
                     </div>
                     <div className="m-2 ">
                         <i>Portfolio:&nbsp;</i>
-                        <select className="form-control" id="portfolioList" onChange={(evt) => this.onChangePortfolio(evt)}>
+                        <select className="form-control" id="portfolio" onChange={(evt) => this.onChangePortfolio(evt)}>
                             <option value=""></option>
                             {portfolioList}
                         </select>
                     </div>
                     <div className="m-2 ">
                         <i>Program:&nbsp;</i>
-                        <select className="form-control" id="portfolioList" onChange={(evt) => this.onChangeProgram(evt)}>
+                        <select className="form-control" id="program" onChange={(evt) => this.onChangeProgram(evt)}>
                             <option value=""></option>
                             {programList}
                         </select>
                     </div>
+                    <button className="btn btn-primary" onClick={() => this.getDependencyMappings()}><i>Load</i></button>
                 </div>
 
-                <div className="row mt-2">
-                    <div className="m-2 ">
-                        <i>My Team:&nbsp;</i>
-                        <select className="form-control" id="teamList" onChange={(evt) => this.onChangeTeam(evt)}>
-                            <option value=""></option>
-                            {teamList}
-                        </select>
-                    </div>
-                    <div className="col-md-2">
-                            <i>My Feature</i>
+                <div className="row">
+                    <div className="col-md-6 p-1">
+                        <div className="card">
                             <div className="card-body">
-                                <textarea className="form-control" id="myfeature" rows="3" value={this.state.dependencyConfig.myFeature}
-                                    onChange={(e) => this.onchangeMyFeature(e)}></textarea>
+                                <h5 className="card-title">Dependency Mappings</h5>
+                                <table className="table">
+                                    <thead className="thead-light">
+                                        <tr className="darkThead text-white font-weight-bold">
+                                            <td>My Team</td>
+                                            <td>My Feature</td>
+                                            <td className="border-right">ItrNo</td>
+                                            <td>Dependent Team</td>
+                                            <td>Dependent Feature</td>
+                                            <td>ItrNo</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {listdependencyConfigs}
+                                    </tbody>
+                                </table>
+
                             </div>
+                        </div>
                     </div>
-                    <div className="col-md-1">
-                             <i>Iterations: &nbsp;</i>
-                     <select className="form-control" id="myIterations" onChange={(evt) => this.onChangeMyIterations(evt)}>
-                            <option value=""></option>
-                            {iterationsSelectList}
-                        </select>
-                                
-                            
-                        
+                    <div className="col-md-6 p-1">
+
+                        <div className="card">
+                            <div className="card-body">
+                                <h5 className="card-title">Selected Dependency Details</h5>
+                                <div className="row">
+                                    <div className="col-md-5">
+                                        <div className="form-group">
+                                            <label for="myteam">My Team:</label>
+                                            <select className="form-control" id="myTeamList" value={this.state.dependencyConfig.myTeamId} onChange={(evt) => this.onChangeTeam(evt)}>
+                                                <option value=""></option>
+                                                {teamList}
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label for="myteam">My Feature:</label>
+
+                                            <textarea className="form-control" id="myfeature" rows="3" value={this.state.dependencyConfig.myFeature}
+                                                onChange={(e) => this.onchangeMyFeature(e)}></textarea>
+
+                                        </div>
+                                        <div className="form-group">
+                                            <label for="myteam">Iterations:</label>
+
+                                            <select className="form-control" id="myIterations" value={this.state.dependencyConfig.myTeamItrId} onChange={(evt) => this.onChangeMyIterations(evt)}>
+                                                <option value=""></option>
+                                                {iterationsSelectList}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-2 marginAuto "><span className="dependOn" >ON</span></div>
+                                    <div className="col-md-5">
+                                        <div className="form-group">
+                                            <label for="myteam">Dependent Team:</label>
+                                            <select className="form-control" id="dependentTeamList" value={this.state.dependencyConfig.dependentTeamId} onChange={(evt) => this.onChangeDependentTeam(evt)}>
+                                                <option value=""></option>
+                                                {teamList}
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label for="myteam">Dependent Feature:</label>
+                                            <textarea className="form-control" id="dependentfeature" rows="3" value={this.state.dependencyConfig.dependentFeature}
+                                                onChange={(e) => this.onchangeDependentFeature(e)}></textarea>
+                                        </div>
+                                        <div className="form-group">
+                                            <label for="myteam">Dependent Iterations:</label>
+
+                                            <select className="form-control" id="dependentIterations" value={this.state.dependencyConfig.dependentTeamItrId} onChange={(evt) => this.onChangeDependentIterations(evt)}>
+                                                <option value=""></option>
+                                                {iterationsSelectList}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col-md-1">
+                                        <button className="btn btn-primary" onClick={() => this.submitDependency()}><i>Save</i></button>
+                                    </div>
+                                    <div className="col-md-1">
+                                        <button className="btn btn-primary" onClick={() => this.createNewDependency()}><i>New</i></button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                <div className="row mt-2">
-                    <div className="m-2 ">
-                        <i>Dependent Team:&nbsp;</i>
-                        <select className="form-control" id="dependentTeamList" onChange={(evt) => this.onChangeDependentTeam(evt)}>
-                            <option value=""></option>
-                            {dependentTeamList}
-                        </select>
-                    </div>
-                    <div className="col-md-2">
-                            <i>Dependent Feature</i>
-                            <div className="card-body">
-                                <textarea className="form-control" id="dependentfeature" rows="3" value={this.state.dependencyConfig.dependentFeature}
-                                    onChange={(e) => this.onchangeDependentFeature(e)}></textarea>
-                            </div>
-                    </div>
-                    <div className="col-md-1">
-                             <i>Dependent Iterations: &nbsp;</i>
-                     <select className="form-control" id="dependentIterations" onChange={(evt) => this.onChangeDependentIterations(evt)}>
-                            <option value=""></option>
-                            {iterationsSelectList}
-                        </select>
-                    </div>   
-                </div>
-                <button className="btn btn-primary" onClick={() => this.submitDependency()}><i>Submit</i></button>
+
             </div>
         )
     }

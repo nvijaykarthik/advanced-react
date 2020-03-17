@@ -277,8 +277,8 @@ export default class Teams extends Component {
                             <input className="form-control" type="text" value={this.state.newMember} placeholder="Add Member" onChange={(evt) => this.onChangeMember(evt)} />
                             <select className="form-control" id="roleList" value={this.state.memberRole} onChange={(evt) => this.onChangeRole(evt)}>
                                 <option value="">Choose Role</option>
-                                <option value="Dev">Dev</option>
-                                <option value="Test">Test</option>
+                                <option value="DEV">DEV</option>
+                                <option value="TEST">TEST</option>
                                 <option value="SM">SM</option>
                                 <option value="BA">BA</option>
                                 <option value="PO">PO</option>
